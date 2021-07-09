@@ -1,6 +1,9 @@
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
@@ -12,17 +15,52 @@ public class MainWindow extends JFrame implements MouseListener {
 
     private boolean mouse_down = false;
 
-    JMenuBar menu_bar = new JMenuBar();
-    JMenu menu, submenu;
-    JMenuItem menu_item;
+    private JMenuBar menu_bar = new JMenuBar();
+    private JMenu menu, submenu;
+    private JMenuItem menu_item;
+
+    private JPopupMenu right_click_menu;
 
     private JTabbedPane tabs = new JTabbedPane();
+
     List<Canvas> canvases;
+    Canvas current_canvas = null;
+    MainWindow self;
 
     public MainWindow(List<Graph> graphs, String name) {
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
+        self = this;
+
+        right_click_menu = new JPopupMenu();
+        JMenuItem item = new JMenuItem("Start node");
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current_canvas.addStartNode();
+            }
+        });
+        right_click_menu.add(item);
+        item = new JMenuItem("Conversation node");
+        right_click_menu.add(item);
+        item = new JMenuItem("Choice node");
+        right_click_menu.add(item);
+        item = new JMenuItem("End node");
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current_canvas.addEndNode();
+            }
+        });
+        right_click_menu.add(item);
+
+        tabs.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                current_canvas = canvases.get(tabs.getSelectedIndex());
+            }
+        });
 
         menu = new JMenu("File");
         menu_bar.add(menu);
@@ -48,7 +86,12 @@ public class MainWindow extends JFrame implements MouseListener {
             public void actionPerformed(ActionEvent e) {
                 Graph new_graph = new Graph("Untitled");
                 graphs.add(new_graph);
-                Canvas new_canvas = new Canvas(new_graph);
+                Canvas new_canvas = new Canvas(new_graph, self);
+                new_canvas.addMouseListener(self);
+                new_canvas.setBackground(Color.WHITE);
+                new_canvas.setComponentPopupMenu(right_click_menu);
+                new_canvas.setBorder(BorderFactory.createBevelBorder(1));
+                current_canvas = new_canvas;
                 canvases.add(new_canvas);
                 tabs.add("Untitiled", new_canvas);
             }
@@ -60,8 +103,9 @@ public class MainWindow extends JFrame implements MouseListener {
 
         canvases = new ArrayList<>();
         for (Graph graph : graphs) {
-            Canvas canvas = new Canvas(graph);
+            Canvas canvas = new Canvas(graph, self);
             canvas.addMouseListener(this);
+            canvas.setComponentPopupMenu(right_click_menu);
             canvas.setBackground(Color.WHITE);
             canvas.setBorder(BorderFactory.createBevelBorder(1));
             tabs.add(graph.name, canvas);
@@ -82,20 +126,67 @@ public class MainWindow extends JFrame implements MouseListener {
         setTitle(name);
     }
 
+    public void trackRelocate(JComponent component) {
+        Point offset = component.getMousePosition();
+        mouse_down = true;
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                Point old = current_canvas.getMousePosition();
+                while (mouse_down) {
+                    Point mouse_loc = current_canvas.getMousePosition();
+                    if (mouse_loc.distance(old) > 1) {
+                        old = mouse_loc;
+                        mouse_loc.translate(-offset.x, -offset.y);
+                        component.setLocation(mouse_loc);
+                        Thread.sleep(10);
+                    }
+                }
+                return null;
+            }
+        };
+        worker.execute();
+    }
+
+    private void trackGrab() {
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                Point old = MouseInfo.getPointerInfo().getLocation();
+                while (mouse_down) {
+                    Point mouse_loc = MouseInfo.getPointerInfo().getLocation();
+                    if (mouse_loc.distance(old) > 1) {
+                        Point holder = mouse_loc.getLocation();
+                        mouse_loc.translate(-old.x, -old.y);
+                        old = holder;
+                        current_canvas.translateAll(mouse_loc);
+                        Thread.sleep(10);
+                    }
+                }
+                return null;
+            }
+        };
+        worker.execute();
+    }
+
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        if (e.getButton() == MouseEvent.BUTTON2) {
+            mouse_down = true;
+            trackGrab();
+        }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        mouse_down = false;
+        if (e.getButton() == MouseEvent.BUTTON2) {
+            mouse_down = false;
+        }
     }
 
     @Override
@@ -106,5 +197,9 @@ public class MainWindow extends JFrame implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public void endMouse() {
+        mouse_down = false;
     }
 }
