@@ -4,6 +4,10 @@ public class Graph implements DialogueGraph {
     public Graph(String name) {
         this.name = name;
     }
+    public Graph(String name, String filePath){
+        this.name = name;
+        //For creating a graph loaded from a file
+    }
 
     @Override
     public void addStartNode(StartNode newStart) {
