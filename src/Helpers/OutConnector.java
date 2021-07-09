@@ -1,6 +1,7 @@
 package Helpers;
 
 import Frames.MainWindow;
+import Panels.NodePanel;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,10 +1,11 @@
 package Nodes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Node {
     private int id;
-    private List<Node> children;
+    private List<Node> children = new ArrayList<>();
 
     public void setId(int id){
         this.id = id;

@@ -1,6 +1,6 @@
 package Frames;
 
-import Helpers.NodePanel;
+import Panels.NodePanel;
 import Helpers.OutConnector;
 import Managers.Graph;
 
@@ -58,6 +58,12 @@ public class MainWindow extends JFrame implements MouseListener {
         });
         right_click_menu.add(item);
         item = new JMenuItem("Choice node");
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current_canvas.addChoiceNode();
+            }
+        });
         right_click_menu.add(item);
         item = new JMenuItem("End node");
         item.addActionListener(new ActionListener() {

@@ -19,7 +19,6 @@ public class ComponentListener extends MouseAdapter {
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             window.trackRelocate(panel);
-            System.out.println("here");
         }
     }
 
