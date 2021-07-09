@@ -4,6 +4,10 @@ public class Node {
     private int id;
     private List<Node> children;
 
+    public Node(int id){
+        this.id = id;
+    }
+
     public int getId() {
         return id;
     }
