@@ -1,8 +1,13 @@
+import java.util.List;
+
 public class Node {
-    private int id;
-    private Node[] children;
+    private List<Node> children;
 
-    public Node(int id){ this.id = id;};
+    public List<Node> getChildren(){
+        return this.children;
+    }
 
-    public int getId(){return this.id;}
+    public void addChild(Node newChild){
+        this.children.add(newChild);
+    }
 }
