@@ -1,8 +1,6 @@
 package Frames;
 
-import Frames.MainWindow;
 import Helpers.ComponentListener;
-import Managers.DialogueGraph;
 import Managers.Graph;
 
 import javax.swing.*;
@@ -14,7 +12,7 @@ import java.util.List;
 
 public class Canvas extends JPanel implements PropertyChangeListener {
 
-    private final DialogueGraph graph;
+    private final Graph graph;
     public boolean has_start_node = false;
     public final List<JComponent> components;
     private GridBagConstraints constraints;
