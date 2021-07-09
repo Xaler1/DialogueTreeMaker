@@ -1,3 +1,7 @@
+package Frames;
+
+import Managers.Graph;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -80,23 +84,14 @@ public class MainWindow extends JFrame implements MouseListener {
 
         menu = new JMenu("Add");
         menu_bar.add(menu);
-        menu_item = new JMenuItem("Graph");
+        menu_item = new JMenuItem("Managers.Graph");
         menu_item.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Graph new_graph = new Graph("Untitled");
-                graphs.add(new_graph);
-                Canvas new_canvas = new Canvas(new_graph, self);
-                new_canvas.addMouseListener(self);
-                new_canvas.setBackground(Color.WHITE);
-                new_canvas.setComponentPopupMenu(right_click_menu);
-                new_canvas.setBorder(BorderFactory.createBevelBorder(1));
-                current_canvas = new_canvas;
-                canvases.add(new_canvas);
-                tabs.add("Untitiled", new_canvas);
+                createCanvas("");
             }
         });
-        menu_item.setText("Graph");
+        menu_item.setText("Managers.Graph");
         menu.add(menu_item);
         menu_item = new JMenuItem("Data folder");
         menu.add(menu_item);
@@ -169,6 +164,18 @@ public class MainWindow extends JFrame implements MouseListener {
         worker.execute();
     }
 
+    private void createCanvas(String name) {
+        Graph new_graph = new Graph("Untitled");
+        graphs.add(new_graph);
+        Canvas new_canvas = new Canvas(new_graph, self);
+        new_canvas.addMouseListener(self);
+        new_canvas.setBackground(Color.WHITE);
+        new_canvas.setComponentPopupMenu(right_click_menu);
+        new_canvas.setBorder(BorderFactory.createBevelBorder(1));
+        current_canvas = new_canvas;
+        canvases.add(new_canvas);
+        tabs.add("Untitiled", new_canvas);
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {

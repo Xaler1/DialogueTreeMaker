@@ -1,3 +1,7 @@
+package Helpers;
+
+import Frames.MainWindow;
+
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;

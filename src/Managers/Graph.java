@@ -1,3 +1,8 @@
+package Managers;
+
+import Managers.DialogueGraph;
+import Nodes.*;
+
 import java.awt.*;
 import java.util.HashMap;
 

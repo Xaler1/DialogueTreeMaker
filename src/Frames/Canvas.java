@@ -1,8 +1,12 @@
-import com.sun.tools.javac.Main;
+package Frames;
+
+import Frames.MainWindow;
+import Helpers.ComponentListener;
+import Managers.DialogueGraph;
+import Managers.Graph;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -10,7 +14,7 @@ import java.util.List;
 
 public class Canvas extends JPanel implements PropertyChangeListener {
 
-    private final Graph graph;
+    private final DialogueGraph graph;
     public boolean has_start_node = false;
     public final List<JComponent> components;
     private GridBagConstraints constraints;
@@ -32,6 +36,11 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     }
 
     public void addStartNode() {
+        if (has_start_node) {
+            JOptionPane.showMessageDialog(this, "A single graph cannot have more than one node.", "Start node already in graph", JOptionPane.PLAIN_MESSAGE);
+            return;
+        }
+
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.ipadx = 10;
