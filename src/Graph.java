@@ -30,8 +30,8 @@ public class Graph implements DialogueGraph {
     }
 
     @Override
-    public Node getNode(int id) {
-        return null;
+    public void removeNode(int id) {
+
     }
 
     @Override
