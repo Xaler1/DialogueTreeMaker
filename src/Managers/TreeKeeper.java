@@ -1,3 +1,7 @@
+package Managers;
+
+import Frames.MainWindow;
+
 import java.util.LinkedList;
 import java.util.List;
 

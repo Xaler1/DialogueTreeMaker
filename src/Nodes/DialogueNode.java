@@ -1,3 +1,5 @@
+package Nodes;
+
 public class DialogueNode extends Node {
     private String dialogueText;
 

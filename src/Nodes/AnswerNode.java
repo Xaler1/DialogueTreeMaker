@@ -1,3 +1,5 @@
+package Nodes;
+
 public class AnswerNode extends Node {
     private String answerText;
 

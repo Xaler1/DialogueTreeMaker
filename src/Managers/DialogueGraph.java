@@ -1,3 +1,10 @@
+package Managers;
+
+import Nodes.AnswerNode;
+import Nodes.DialogueNode;
+import Nodes.EndNode;
+import Nodes.StartNode;
+
 import java.awt.*;
 
 public interface DialogueGraph {
