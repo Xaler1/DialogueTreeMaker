@@ -1,15 +1,15 @@
 package Frames;
 
+import Helpers.NodePanel;
+import Helpers.OutConnector;
 import Managers.Graph;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +27,18 @@ public class MainWindow extends JFrame implements MouseListener {
 
     private JTabbedPane tabs = new JTabbedPane();
 
-    List<Canvas> canvases;
+    private final List<Canvas> canvases;
     Canvas current_canvas = null;
     MainWindow self;
+
+    public NodePanel potential_end_component = null;
 
     public MainWindow(List<Graph> graphs, String name) {
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         self = this;
+        this.graphs = graphs;
 
         right_click_menu = new JPopupMenu();
         JMenuItem item = new JMenuItem("Start node");
@@ -46,7 +49,13 @@ public class MainWindow extends JFrame implements MouseListener {
             }
         });
         right_click_menu.add(item);
-        item = new JMenuItem("Conversation node");
+        item = new JMenuItem("Dialogue node");
+        item.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                current_canvas.addDialogueNode();
+            }
+        });
         right_click_menu.add(item);
         item = new JMenuItem("Choice node");
         right_click_menu.add(item);
@@ -84,26 +93,21 @@ public class MainWindow extends JFrame implements MouseListener {
 
         menu = new JMenu("Add");
         menu_bar.add(menu);
-        menu_item = new JMenuItem("Managers.Graph");
+        menu_item = new JMenuItem("Graph");
         menu_item.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 createCanvas("");
             }
         });
-        menu_item.setText("Managers.Graph");
+        menu_item.setText("Graph");
         menu.add(menu_item);
         menu_item = new JMenuItem("Data folder");
         menu.add(menu_item);
 
         canvases = new ArrayList<>();
         for (Graph graph : graphs) {
-            Canvas canvas = new Canvas(graph, self);
-            canvas.addMouseListener(this);
-            canvas.setComponentPopupMenu(right_click_menu);
-            canvas.setBackground(Color.WHITE);
-            canvas.setBorder(BorderFactory.createBevelBorder(1));
-            tabs.add(graph.name, canvas);
+            createCanvas(graph.name);
         }
 
         constraints.gridx = 2;
@@ -119,6 +123,17 @@ public class MainWindow extends JFrame implements MouseListener {
         setSize(screen_size.width, screen_size.height);
         setVisible(true);
         setTitle(name);
+
+        this.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.isAltDown() && e.getKeyCode() == KeyEvent.VK_LEFT && tabs.getTabCount() > 0) {
+                    tabs.setSelectedIndex(Math.max(0, tabs.getSelectedIndex() - 1));
+                } else if (e.isAltDown() && e.getKeyCode() == KeyEvent.VK_RIGHT && tabs.getTabCount() > 0) {
+                    tabs.setSelectedIndex(Math.max(tabs.getTabCount() - 1, tabs.getSelectedIndex() + 1));
+                }
+            }
+        });
     }
 
     public void trackRelocate(JComponent component) {
@@ -133,7 +148,7 @@ public class MainWindow extends JFrame implements MouseListener {
                     if (mouse_loc.distance(old) > 1) {
                         old = mouse_loc;
                         mouse_loc.translate(-offset.x, -offset.y);
-                        component.setLocation(mouse_loc);
+                        current_canvas.relocatedNode(component, mouse_loc);
                         Thread.sleep(10);
                     }
                 }
@@ -164,8 +179,66 @@ public class MainWindow extends JFrame implements MouseListener {
         worker.execute();
     }
 
+    public void trackConnect(OutConnector component, Point start) {
+        mouse_down = true;
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                while (mouse_down) {
+                    Point mouse_loc = current_canvas.getMousePosition();
+                    current_canvas.temp_line = new Line2D.Float(start, mouse_loc);
+                    current_canvas.updateLines();
+                    Thread.sleep(10);
+                }
+                if (potential_end_component != null) { ;
+                    current_canvas.createLink(component, potential_end_component);
+                }
+                current_canvas.temp_line = null;
+                current_canvas.updateLines();
+                return null;
+            }
+        };
+        worker.execute();
+    }
+
     private void createCanvas(String name) {
-        Graph new_graph = new Graph("Untitled");
+        if (name.equals("")) {
+            while (true) {
+                name = (String) JOptionPane.showInputDialog(
+                        this,
+                        "Enter the name of the graph.",
+                        "Graph name",
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        null,
+                        name
+                );
+                if (name == null) {
+                    return;
+                }
+                if (name.trim().length() == 0) {
+                    JOptionPane.showMessageDialog(this, "You must enter a name", "Invalid name", JOptionPane.ERROR_MESSAGE);
+                } else if (name.contains(" ")) {
+                    JOptionPane.showMessageDialog(this, "The name cannot contain any spaces", "Invalid name", JOptionPane.ERROR_MESSAGE);
+                } else if (name.contains(".")) {
+                    JOptionPane.showMessageDialog(this, "The name cannot contain dots", "Invalid name", JOptionPane.ERROR_MESSAGE);
+                } else if (name.length() > 30) {
+                    JOptionPane.showMessageDialog(this, "The name must be less than 30 characters", "Invalid name", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    boolean duplicate = false;
+                    for (Graph graph : graphs) {
+                        if (name.equals(graph.name)) {
+                            JOptionPane.showMessageDialog(this, "There is already a graph with this name", "Invalid name", JOptionPane.ERROR_MESSAGE);
+                            duplicate = true;
+                            break;
+                        }
+                    }
+                    if (duplicate) continue;
+                    break;
+                }
+            }
+        }
+        Graph new_graph = new Graph(name);
         graphs.add(new_graph);
         Canvas new_canvas = new Canvas(new_graph, self);
         new_canvas.addMouseListener(self);
@@ -174,7 +247,7 @@ public class MainWindow extends JFrame implements MouseListener {
         new_canvas.setBorder(BorderFactory.createBevelBorder(1));
         current_canvas = new_canvas;
         canvases.add(new_canvas);
-        tabs.add("Untitiled", new_canvas);
+        tabs.add(name, new_canvas);
     }
 
     @Override
@@ -191,9 +264,7 @@ public class MainWindow extends JFrame implements MouseListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON2) {
-            mouse_down = false;
-        }
+        mouse_down = false;
     }
 
     @Override
