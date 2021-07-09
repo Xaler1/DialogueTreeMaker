@@ -13,5 +13,6 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     public Canvas(Graph graph) {
         this.graph = graph;
+        setLayout(null);
     }
 }

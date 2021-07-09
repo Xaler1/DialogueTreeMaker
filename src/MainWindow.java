@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,8 @@ public class MainWindow extends JFrame implements MouseListener {
     JMenuBar menu_bar = new JMenuBar();
     JMenu menu, submenu;
     JMenuItem menu_item;
+    JButton test;
+    MainWindow self;
 
     private JTabbedPane tabs = new JTabbedPane();
     List<Canvas> canvases;
@@ -23,6 +26,7 @@ public class MainWindow extends JFrame implements MouseListener {
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
+        self = this;
 
         menu = new JMenu("File");
         menu_bar.add(menu);
@@ -39,6 +43,7 @@ public class MainWindow extends JFrame implements MouseListener {
         submenu.add(menu_item);
         menu_item = new JMenuItem("JSON");
         submenu.add(menu_item);
+        test= new JButton("test");
 
         menu = new JMenu("Add");
         menu_bar.add(menu);
@@ -49,6 +54,10 @@ public class MainWindow extends JFrame implements MouseListener {
                 Graph new_graph = new Graph("Untitled");
                 graphs.add(new_graph);
                 Canvas new_canvas = new Canvas(new_graph);
+                new_canvas.addMouseListener(self);
+                test = new JButton("test");
+                test.setBounds(10, 10, 100, 100);
+                new_canvas.add(test);
                 canvases.add(new_canvas);
                 tabs.add("Untitiled", new_canvas);
             }
@@ -82,6 +91,25 @@ public class MainWindow extends JFrame implements MouseListener {
         setTitle(name);
     }
 
+    public void trackDrag() {
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                Point2D old = new Point2D.Double(10, 10);
+                while (mouse_down) {
+                    Point2D mouse_loc = MouseInfo.getPointerInfo().getLocation();
+                    if (mouse_loc.distance(old) > 1) {
+                        old = mouse_loc;
+                        test.setBounds((int)mouse_loc.getX(), (int)mouse_loc.getY(), 100, 100);
+                        //self.update(self.getGraphics());
+                    }
+                    Thread.sleep(10);
+                }
+                return null;
+            }
+        };
+        worker.execute();
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -90,7 +118,8 @@ public class MainWindow extends JFrame implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-
+        mouse_down = true;
+        trackDrag();
     }
 
     @Override
