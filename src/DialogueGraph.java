@@ -3,6 +3,6 @@ public interface DialogueGraph {
     void addDialogueNode(DialogueNode newDialogue);
     void addAnswerNode(AnswerNode newAnswer);
     void addEndNode(EndNode newEnd);
-    Node getNode(int id);
+    void removeNode(int id);
     void writeToFile();
 }
