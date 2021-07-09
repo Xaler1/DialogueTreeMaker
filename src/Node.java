@@ -1,7 +1,12 @@
 import java.util.List;
 
 public class Node {
+    private int id;
     private List<Node> children;
+
+    public int getId() {
+        return id;
+    }
 
     public List<Node> getChildren(){
         return this.children;
@@ -9,5 +14,13 @@ public class Node {
 
     public void addChild(Node newChild){
         this.children.add(newChild);
+    }
+
+    public void removeChild(int childId){
+        for(Node item : this.children){
+            if(item.getId() == childId){
+                this.children.remove(item);
+            }
+        }
     }
 }
