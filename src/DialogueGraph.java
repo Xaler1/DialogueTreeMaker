@@ -1,8 +1,10 @@
+import java.awt.*;
+
 public interface DialogueGraph {
-    void addStartNode(StartNode newStart);
-    void addDialogueNode(DialogueNode newDialogue);
-    void addAnswerNode(AnswerNode newAnswer);
-    void addEndNode(EndNode newEnd);
+    void addStartNode(Component startNodeElement);
+    void addDialogueNode(Component dialogueNodeElement, String dialogueText);
+    void addAnswerNode(Component answerNodeElement, String answerText);
+    void addEndNode(Component endNodeElement);
     void removeNode(int id);
     void writeToFile();
 }

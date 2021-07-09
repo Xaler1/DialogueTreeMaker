@@ -1,5 +1,15 @@
 public class AnswerNode extends Node {
-    public AnswerNode(int id) {
-        super(id);
+    private String answerText;
+
+    public AnswerNode(String answerText) {
+        this.answerText = answerText;
+    }
+
+    public String getAnswerText() {
+        return answerText;
+    }
+
+    public void setAnswerText(String answerText) {
+        this.answerText = answerText;
     }
 }

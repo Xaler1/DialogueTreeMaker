@@ -4,7 +4,7 @@ public class Node {
     private int id;
     private List<Node> children;
 
-    public Node(int id){
+    public void setId(int id){
         this.id = id;
     }
 

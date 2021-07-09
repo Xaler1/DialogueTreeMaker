@@ -16,24 +16,35 @@ public class Graph implements DialogueGraph {
         //For creating a graph loaded from a file
     }
 
-    @Override
-    public void addStartNode(StartNode newStart) {
-
+    private void addNode(Component elementUI, Node item) {
+        this.numNodes += 1;
+        item.setId(this.numNodes);
+        this.companantKeys.put(elementUI, this.numNodes);
+        this.idKeys.put(this.numNodes, item);
     }
 
     @Override
-    public void addDialogueNode(DialogueNode newDialogue) {
-
+    public void addStartNode(Component startNodeElement) {
+        addNode(startNodeElement, new StartNode());
     }
 
     @Override
-    public void addAnswerNode(AnswerNode newAnswer) {
-
+    public void addDialogueNode(Component dialogueNodeElement, String dialogueText) {
+        addNode(dialogueNodeElement, new DialogueNode(dialogueText));
     }
 
     @Override
-    public void addEndNode(EndNode newEnd) {
+    public void addAnswerNode(Component answerNodeElement, String answerText) {
+        addNode(answerNodeElement, new AnswerNode(answerText));
+    }
 
+    @Override
+    public void addEndNode(Component endNodeElement) {
+        addNode(endNodeElement, new EndNode());
+    }
+
+    public Node getNode(Component itemElement){
+        return this.idKeys.get(this.companantKeys.get(itemElement));
     }
 
     @Override
