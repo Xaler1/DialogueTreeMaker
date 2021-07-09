@@ -1,7 +1,7 @@
 public class Node {
-    private Node nextNode;
+    private int id;
 
-    public Node getNext() {
-        return this.nextNode;
-    }
+    public Node(int id){ this.id = id;};
+
+    public int getId(){return this.id;}
 }
