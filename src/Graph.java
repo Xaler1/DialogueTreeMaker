@@ -29,4 +29,9 @@ public class Graph implements DialogueGraph {
     public Node getNode(int id) {
         return null;
     }
+
+    @Override
+    public void writeToFile() {
+
+    }
 }

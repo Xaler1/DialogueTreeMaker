@@ -4,4 +4,5 @@ public interface DialogueGraph {
     void addAnswerNode(AnswerNode newAnswer);
     void addEndNode(EndNode newEnd);
     Node getNode(int id);
+    void writeToFile();
 }
