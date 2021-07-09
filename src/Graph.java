@@ -3,7 +3,9 @@ import java.util.HashMap;
 
 public class Graph implements DialogueGraph {
     public String name;
-    private HashMap<Component, Node> keys = new HashMap<Component, Node>();
+    private HashMap<Component, Integer> companantKeys = new HashMap<Component, Integer>();
+    private HashMap<Integer, Node> idKeys = new HashMap<Integer, Node>();
+    private int numNodes = 0;
 
     public Graph(String name) {
         this.name = name;
