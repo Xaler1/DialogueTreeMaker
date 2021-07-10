@@ -39,6 +39,8 @@ public class MainWindow extends JFrame implements MouseListener {
 
     public NodePanel potential_end_component = null;
 
+    public boolean show_grid = true;
+
     public MainWindow(List<Graph> graphs, String name) {
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         scale = new Point2D.Float(screen_size.width / 2560.0f, screen_size.height / 1440.0f);
@@ -85,6 +87,7 @@ public class MainWindow extends JFrame implements MouseListener {
             @Override
             public void stateChanged(ChangeEvent e) {
                 current_canvas = canvases.get(tabs.getSelectedIndex());
+                current_canvas.updateLines();
             }
         });
 
@@ -117,6 +120,19 @@ public class MainWindow extends JFrame implements MouseListener {
         menu.add(menu_item);
         menu_item = new JMenuItem("Data folder");
         menu.add(menu_item);
+
+        menu = new JMenu("Settings");
+        menu_bar.add(menu);
+        JCheckBoxMenuItem check_item = new JCheckBoxMenuItem("Show grid");
+        check_item.setSelected(true);
+        check_item.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                show_grid = check_item.getState();
+                current_canvas.updateLines();
+            }
+        });
+        menu.add(check_item);
 
         canvases = new ArrayList<>();
         for (Graph graph : graphs) {

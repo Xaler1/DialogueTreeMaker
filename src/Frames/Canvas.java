@@ -13,6 +13,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.nio.channels.Pipe;
 import java.util.*;
 import java.util.List;
 
@@ -28,6 +29,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     public Line2D temp_line = null;
     public Point2D scale;
+    private Point start = new Point(0, 0);
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -61,6 +63,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
                         for (NodePanel panel : components) {
                             panel.rescale(diff, getMousePosition());
                         }
+                        translateStart(diff, getMousePosition());
                         updateLines();
                         return null;
                     }
@@ -119,6 +122,8 @@ public class Canvas extends JPanel implements PropertyChangeListener {
                 component.setLocation(old_loc);
             }
         }
+        start.translate(offset.x, offset.y);
+        updateLines();
     }
 
     public void relocatedNode(Component component, Point loc) {
@@ -141,6 +146,12 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    private void translateStart(float mod, Point source) {
+        start.translate(-source.x, -source.y);
+        start.setLocation(start.x * mod, start.y * mod);
+        start.translate(source.x, source.y);
+    }
+
 
     @Override
     public void paintComponent(Graphics g) {
@@ -152,6 +163,20 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         for (NodePanel panel : components) {
             if (panel.getOutConnector() != null && panel.getOutConnector().destination != null) {
                 painter.draw(new Line2D.Float(panel.getOutConnector().getCenter(), panel.getOutConnector().destination.getCenter()));
+            }
+        }
+        if (window.show_grid) {
+            painter.setStroke(new BasicStroke((float) scale.getX()));
+            float spacing = (float) (scale.getX() * 50);
+            Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
+            start.x = Math.floorMod(start.x, (int) spacing);
+            start.y = Math.floorMod(start.y, (int) spacing);
+            for (float x = start.x; x < screen_size.width; x += spacing) {
+                painter.draw(new Line2D.Float(x, 0, x, screen_size.height));
+            }
+
+            for (float y = start.y; y < screen_size.height; y += spacing) {
+                painter.draw(new Line2D.Float(0, y, screen_size.width, y));
             }
         }
     }
