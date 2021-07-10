@@ -82,7 +82,8 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         StartPanel start_node = new StartPanel(window, this.getMousePosition());
         this.add(start_node);
         components.add(start_node);
-        this.update(this.getGraphics());
+        //this.update(this.getGraphics());
+        repaint();
         has_start_node = true;
 
         graph.addStartNode(start_node);
@@ -92,7 +93,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         EndPanel end_node = new EndPanel(window, getMousePosition());
         this.add(end_node);
         components.add(end_node);
-        this.update(this.getGraphics());
+        repaint();
 
         graph.addEndNode(end_node);
     }
@@ -102,7 +103,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
         add(dialogue_node);
         components.add(dialogue_node);
-        this.update(this.getGraphics());
+        repaint();
         graph.addDialogueNode(dialogue_node, "Hello world");
     }
 
@@ -111,7 +112,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         graph.addDialogueNode(dialogue_node, "Hello world");
         add(dialogue_node);
         components.add(dialogue_node);
-        this.update(this.getGraphics());
+        repaint();
     }
 
     public void translateAll(Point offset) {
