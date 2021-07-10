@@ -3,8 +3,11 @@ package Helpers;
 import Frames.MainWindow;
 import Panels.NodePanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class InConnector extends JLabel {
 
@@ -13,10 +16,22 @@ public class InConnector extends JLabel {
 
     public InConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
-        ImageIcon icon = new ImageIcon("imgs/in_connector.png");
-        setIcon(icon);
         this.window = window;
+        rescale();
         addMouseListener(new InListener(window, this));
+    }
+
+    public void rescale() {
+        Image img = null;
+        try {
+            img = ImageIO.read(new File("imgs/in_connector.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        Image scaled = img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(scaled);
+        setIcon(icon);
+        setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
     @Override

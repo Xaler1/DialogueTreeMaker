@@ -10,6 +10,7 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +29,17 @@ public class MainWindow extends JFrame implements MouseListener {
     private JTabbedPane tabs = new JTabbedPane();
 
     private final List<Canvas> canvases;
-    Canvas current_canvas = null;
+    public Canvas current_canvas = null;
     MainWindow self;
+    private Point2D scale;
+
+    public final Font main_font = new Font("Serif", Font.PLAIN, 28);
 
     public NodePanel potential_end_component = null;
 
     public MainWindow(List<Graph> graphs, String name) {
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
+        scale = new Point2D.Float(screen_size.width / 2560.0f, screen_size.height / 1440.0f);
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         self = this;
@@ -246,7 +251,7 @@ public class MainWindow extends JFrame implements MouseListener {
         }
         Graph new_graph = new Graph(name);
         graphs.add(new_graph);
-        Canvas new_canvas = new Canvas(new_graph, self);
+        Canvas new_canvas = new Canvas(new_graph, self, scale);
         new_canvas.addMouseListener(self);
         new_canvas.setBackground(Color.WHITE);
         new_canvas.setComponentPopupMenu(right_click_menu);
@@ -280,7 +285,11 @@ public class MainWindow extends JFrame implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent e) {
-
+        Point loc = MouseInfo.getPointerInfo().getLocation();
+        loc.translate(-current_canvas.getLocationOnScreen().x, -current_canvas.getLocationOnScreen().y);
+        if (!current_canvas.contains(loc)){
+            mouse_down = false;
+        }
     }
 
     public void endMouse() {

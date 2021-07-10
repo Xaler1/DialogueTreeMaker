@@ -3,8 +3,11 @@ package Helpers;
 import Frames.MainWindow;
 import Panels.NodePanel;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 
 public class OutConnector extends JLabel {
     private final NodePanel parent;
@@ -13,9 +16,8 @@ public class OutConnector extends JLabel {
 
     public OutConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
-        ImageIcon icon = new ImageIcon("imgs/out_connector.png");
-        setIcon(icon);
         this.window = window;
+        rescale();
         addMouseListener(new OutListener(window, this));
     }
 
@@ -29,6 +31,19 @@ public class OutConnector extends JLabel {
         point.translate(getX(), getY());
         point.translate(getWidth()/2, getHeight()/2);
         return point;
+    }
+
+    public void rescale() {
+        Image img = null;
+        try {
+            img = ImageIO.read(new File("imgs/out_connector.png"));
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        Image scaled = img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
+        ImageIcon icon = new ImageIcon(scaled);
+        setIcon(icon);
+        setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
     public void setDestination(InConnector connector) {

@@ -2,13 +2,15 @@ package Frames;
 
 import Helpers.*;
 import Managers.Graph;
-import Panels.AnswersPanel;
-import Panels.NodePanel;
+import Panels.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.*;
@@ -25,21 +27,47 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     private Graphics2D painter;
 
     public Line2D temp_line = null;
+    public Point2D scale;
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
     }
 
-    public Canvas(Graph graph, MainWindow window) {
+    public Canvas(Graph graph, MainWindow window, Point2D default_scale) {
         this.graph = graph;
         components = new ArrayList<>();
         constraints = new GridBagConstraints();
         main_font = new Font("Serif", Font.PLAIN, 28);
         this.window = window;
+        this.scale = new Point2D.Double(default_scale.getX(), default_scale.getY());
         setLayout(null);
         setFocusable(true);
         requestFocusInWindow();
+
+        addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                SwingWorker worker = new SwingWorker() {
+                    @Override
+                    protected Object doInBackground() throws Exception {
+                        float mod = -.05f;
+                        if (e.getUnitsToScroll() < 0) {
+                            mod = .05f;
+                        }
+                        double old = scale.getX();
+                        scale.setLocation(Math.min(Math.max(0.3, scale.getX() + mod), 3), Math.min(Math.max(0.3, scale.getY() + mod), 3));
+                        float diff = (float) (scale.getX() / old);
+                        for (NodePanel panel : components) {
+                            panel.rescale(diff, getMousePosition());
+                        }
+                        updateLines();
+                        return null;
+                    }
+                };
+                worker.execute();
+            }
+        });
     }
 
     public void addStartNode() {
@@ -48,28 +76,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
             return;
         }
 
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.ipadx = 10;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.EAST;
-        NodePanel start_node = new NodePanel(window);
-        start_node.setLayout(new GridBagLayout());
-        start_node.addMouseListener(new ComponentListener(window, start_node));
-        start_node.setBorder(BorderFactory.createMatteBorder(2, 5, 2, 2, Color.green));
-        start_node.setBackground(Color.lightGray);
-        JLabel start_label = new JLabel("Start");
-        start_label.setFont(main_font);
-        start_node.add(start_label, constraints);
-
-        constraints.gridwidth = 1;
-        constraints.gridx = 1;
-        OutConnector out_connector = new OutConnector(start_node, window);
-        start_node.setOutConnector(out_connector);
-        start_node.add(out_connector, constraints);
-        Point mouse_loc = this.getMousePosition();
-        start_node.setBounds(mouse_loc.x, mouse_loc.y, 120, 50);
+        StartPanel start_node = new StartPanel(window, this.getMousePosition());
         this.add(start_node);
         components.add(start_node);
         this.update(this.getGraphics());
@@ -79,28 +86,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     }
 
     public void addEndNode() {
-        constraints.gridx = 1;
-        constraints.gridy = 0;
-        constraints.ipadx = 10;
-        constraints.gridwidth = 1;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.EAST;
-        NodePanel end_node = new NodePanel(window);
-        end_node.setLayout(new GridBagLayout());
-        end_node.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 5, Color.red));
-        end_node.setBackground(Color.lightGray);
-        end_node.addMouseListener(new ComponentListener(window, end_node));
-        JLabel end_label = new JLabel("End");
-        end_label.setFont(main_font);
-        end_node.add(end_label, constraints);
-
-        constraints.gridwidth = 1;
-        constraints.gridx = 0;
-        InConnector in_connector = new InConnector(end_node, window);
-        end_node.setInConnector(in_connector);
-        end_node.add(in_connector, constraints);
-        Point mouse_loc = this.getMousePosition();
-        end_node.setBounds(mouse_loc.x, mouse_loc.y, 120, 50);
+        EndPanel end_node = new EndPanel(window, getMousePosition());
         this.add(end_node);
         components.add(end_node);
         this.update(this.getGraphics());
@@ -109,30 +95,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     }
 
     public void addDialogueNode() {
-        NodePanel dialogue_node = new NodePanel(window);
-        dialogue_node.setLayout(null);
-        dialogue_node.setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
-        dialogue_node.addMouseListener(new ComponentListener(window, dialogue_node));
-
-        JTextArea text_entry = new JTextArea("Hello world!");
-        text_entry.setLineWrap(true);
-        JScrollPane pane = new JScrollPane(text_entry);
-        pane.setBounds(40, 10, 210, 100);
-        dialogue_node.add(pane);
-
-
-        InConnector in_connector = new InConnector(dialogue_node, window);
-        in_connector.setBounds(5, 45, 30, 30);
-        dialogue_node.add(in_connector);
-        dialogue_node.setInConnector(in_connector);
-
-        OutConnector out_connector = new OutConnector(dialogue_node, window);
-        out_connector.setBounds(255, 45, 30, 30);
-        dialogue_node.add(out_connector);
-        dialogue_node.setOutConnector(out_connector);
-
-        Point mouse_loc = this.getMousePosition();
-        dialogue_node.setBounds(mouse_loc.x, mouse_loc.y, 300, 120);
+        DialoguePanel dialogue_node = new DialoguePanel(window, getMousePosition());
 
         add(dialogue_node);
         components.add(dialogue_node);
@@ -141,41 +104,8 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     }
 
     public void addChoiceNode() {
-        AnswersPanel dialogue_node = new AnswersPanel(window);
+        ChoicePanel dialogue_node = new ChoicePanel(window, graph, getMousePosition());
         graph.addDialogueNode(dialogue_node, "Hello world");
-        dialogue_node.setLayout(null);
-        dialogue_node.setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
-        dialogue_node.addMouseListener(new ComponentListener(window, dialogue_node));
-
-        JTextArea text_entry = new JTextArea("Hello world!");
-        text_entry.setLineWrap(true);
-        JScrollPane pane = new JScrollPane(text_entry);
-        pane.setBounds(40, 10, 210, 100);
-        dialogue_node.add(pane);
-
-        InConnector in_connector = new InConnector(dialogue_node, window);
-        in_connector.setBounds(5, 45, 30, 30);
-        dialogue_node.add(in_connector);
-        dialogue_node.setInConnector(in_connector);
-
-        ImageIcon icon = new ImageIcon("imgs/plus.png");
-        JButton add_btn = new JButton(icon);
-        add_btn.setIcon(icon);
-        add_btn.setBounds(255, 45, 30, 30);
-        add_btn.setAction(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                NodePanel new_ans = dialogue_node.createAnswer();
-                graph.addAnswerNode(new_ans, "");
-                graph.createRelation(dialogue_node, new_ans);
-                components.add(new_ans);
-            }
-        });
-        dialogue_node.add(add_btn);
-
-        Point mouse_loc = this.getMousePosition();
-        dialogue_node.setBounds(mouse_loc.x, mouse_loc.y, 300, 120);
-
         add(dialogue_node);
         components.add(dialogue_node);
         this.update(this.getGraphics());
@@ -183,9 +113,11 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     public void translateAll(Point offset) {
         for (JComponent component : components) {
-            Point old_loc = component.getLocation();
-            old_loc.translate(offset.x, offset.y);
-            component.setLocation(old_loc);
+            if (!(component instanceof AnswerPanel)) {
+                Point old_loc = component.getLocation();
+                old_loc.translate(offset.x, offset.y);
+                component.setLocation(old_loc);
+            }
         }
     }
 
