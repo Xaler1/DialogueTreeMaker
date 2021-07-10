@@ -30,6 +30,8 @@ public class MainWindow extends JFrame implements MouseListener {
 
     private final List<Canvas> canvases;
     public Canvas current_canvas = null;
+    private Characters characters_panel;
+    private Variables variables_panel;
     MainWindow self;
     private Point2D scale;
 
@@ -123,12 +125,21 @@ public class MainWindow extends JFrame implements MouseListener {
 
         constraints.gridx = 2;
         constraints.gridy = 2;
-        constraints.gridwidth = 1;
-        constraints.gridheight = 1;
-        constraints.ipadx = (int) (screen_size.width);
+        constraints.gridheight = 2;
+        constraints.ipadx = (int) (screen_size.width * 0.8);
         constraints.ipady = (int) (screen_size.height);
         setJMenuBar(menu_bar);
         add(tabs, constraints);
+        characters_panel = new Characters();
+        variables_panel = new Variables();
+        constraints.gridx = 3;
+        constraints.gridheight = 1;
+        constraints.ipadx = (int) (screen_size.width * 0.2);
+        constraints.ipady = (int) (screen_size.height * 0.5);
+        add(characters_panel, constraints);
+        constraints.gridy = 3;
+        add(variables_panel, constraints);
+
         setBackground(Color.GRAY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(screen_size.width, screen_size.height);
