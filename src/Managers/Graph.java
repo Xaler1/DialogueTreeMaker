@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class Graph{
+
     public String name;
     private HashMap<Component, Integer> companantKeys = new HashMap<Component, Integer>();
     private HashMap<Integer, Node> idKeys = new HashMap<Integer, Node>();

@@ -14,6 +14,8 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 public class MainWindow extends JFrame implements MouseListener {
 
     private List<Graph> graphs;
@@ -105,6 +107,12 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_item = new JMenuItem("XML");
         submenu.add(menu_item);
         menu_item = new JMenuItem("JSON");
+        menu_item.setAction(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                saveAsJson();
+            }
+        });
         submenu.add(menu_item);
 
         menu = new JMenu("Add");
@@ -172,6 +180,10 @@ public class MainWindow extends JFrame implements MouseListener {
                 }
             }
         });
+    }
+
+    public void saveAsJson() {
+        System.out.println("RAN!");
     }
 
     public void trackRelocate(JComponent component) {
