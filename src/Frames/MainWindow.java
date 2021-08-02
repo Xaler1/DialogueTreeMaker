@@ -1,5 +1,7 @@
 package Frames;
 
+import Managers.Character;
+import Managers.TreeKeeper;
 import Panels.NodePanel;
 import Helpers.OutConnector;
 import Managers.Graph;
@@ -14,11 +16,13 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 public class MainWindow extends JFrame implements MouseListener {
 
     private List<Graph> graphs;
+    private final TreeKeeper keeper;
 
     private boolean mouse_down = false;
 
@@ -26,13 +30,15 @@ public class MainWindow extends JFrame implements MouseListener {
     private JMenu menu, submenu;
     private JMenuItem menu_item;
 
+    private JButton button;
+
     private JPopupMenu right_click_menu;
 
     private JTabbedPane tabs = new JTabbedPane();
 
     private final List<Canvas> canvases;
     public Canvas current_canvas = null;
-    private Characters characters_panel;
+    private CharacterPanel character_panel;
     private Variables variables_panel;
     MainWindow self;
     private Point2D scale;
@@ -43,13 +49,20 @@ public class MainWindow extends JFrame implements MouseListener {
 
     public boolean show_grid = true;
 
-    public MainWindow(List<Graph> graphs, String name) {
+    public MainWindow(List<Graph> graphs, String name, TreeKeeper keeper) {
+        try {
+            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         scale = new Point2D.Float(screen_size.width / 2560.0f, screen_size.height / 1440.0f);
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         self = this;
         this.graphs = graphs;
+        this.keeper = keeper;
 
         right_click_menu = new JPopupMenu();
         JMenuItem item = new JMenuItem("Start node");
@@ -147,21 +160,27 @@ public class MainWindow extends JFrame implements MouseListener {
             createCanvas(graph.name);
         }
 
-        constraints.gridx = 2;
-        constraints.gridy = 2;
+        constraints.gridx = 0;
+        constraints.gridy = 0;
         constraints.gridheight = 2;
-        constraints.ipadx = (int) (screen_size.width * 0.8);
-        constraints.ipady = (int) (screen_size.height);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1;
+        constraints.weighty = 1;
+        //constraints.ipadx = (int) (screen_size.width * 0.8);
+        //constraints.ipady = (int) (screen_size.height);
+        tabs.setPreferredSize(new Dimension(1000, 600));
         setJMenuBar(menu_bar);
         add(tabs, constraints);
-        characters_panel = new Characters();
+        character_panel = new CharacterPanel(keeper);
+        character_panel.setPreferredSize(new Dimension(100, 300));
         variables_panel = new Variables();
-        constraints.gridx = 3;
+        variables_panel.setPreferredSize(new Dimension(100, 300));
+        constraints.gridx = 1;
         constraints.gridheight = 1;
-        constraints.ipadx = (int) (screen_size.width * 0.2);
-        constraints.ipady = (int) (screen_size.height * 0.5);
-        add(characters_panel, constraints);
-        constraints.gridy = 3;
+        //constraints.ipadx = (int) (screen_size.width * 0.14);
+        //constraints.ipady = (int) (screen_size.height * 0.5);
+        add(character_panel, constraints);
+        constraints.gridy = 1;
         add(variables_panel, constraints);
 
         setBackground(Color.GRAY);
@@ -297,6 +316,7 @@ public class MainWindow extends JFrame implements MouseListener {
         new_canvas.setBorder(BorderFactory.createBevelBorder(1));
         current_canvas = new_canvas;
         canvases.add(new_canvas);
+        setDefaultLookAndFeelDecorated(true);
         tabs.add(name, new_canvas);
     }
 
