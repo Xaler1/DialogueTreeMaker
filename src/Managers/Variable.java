@@ -1,5 +1,8 @@
 package Managers;
 
+/*
+    This class is for storing information about variables that can be used in conditional statements.
+ */
 public class Variable {
     public Class type = String.class;
     public String name = "";
