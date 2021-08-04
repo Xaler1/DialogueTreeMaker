@@ -16,6 +16,9 @@ import java.util.*;
 import java.util.List;
 
 //TODO: clean up this mess - make all the panel creation functions more or less the same order.
+/*
+    Test2
+ */
 public class Canvas extends JPanel implements PropertyChangeListener {
 
     public final Graph graph;
