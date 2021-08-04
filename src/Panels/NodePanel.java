@@ -7,7 +7,12 @@ import Managers.Graph;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 import Frames.Canvas;
+import Managers.TreeKeeper;
+import Nodes.Node;
 
 public abstract class NodePanel extends JPanel {
     protected OutConnector out_connector;
@@ -16,25 +21,32 @@ public abstract class NodePanel extends JPanel {
     protected final MainWindow window;
     protected final Canvas canvas;
     protected Graph graph = null;
+    protected final TreeKeeper keeper;
 
     public NodePanel(MainWindow window) {
         setLayout(null);
         this.window = window;
+        this.keeper = window.keeper;
         canvas = window.current_canvas;
+        setup();
     }
 
     public NodePanel(MainWindow window, NodePanel parent) {
         setLayout(null);
         this.parent = parent;
         this.window = window;
+        this.keeper = window.keeper;
         canvas = window.current_canvas;
+        setup();
     }
 
     public NodePanel(MainWindow window, Graph graph) {
         setLayout(null);
         this.window = window;
         this.graph = graph;
+        this.keeper = window.keeper;
         canvas = window.current_canvas;
+        setup();
     }
 
     public NodePanel(MainWindow window, NodePanel parent, Graph graph) {
@@ -42,7 +54,15 @@ public abstract class NodePanel extends JPanel {
         this.window = window;
         this.parent = parent;
         this.graph = graph;
+        this.keeper = window.keeper;
         canvas = window.current_canvas;
+        setup();
+    }
+
+    public abstract void setNode(Node node);
+
+    private void setup() {
+
     }
 
     public void setOutConnector(OutConnector connector) {
@@ -84,6 +104,19 @@ public abstract class NodePanel extends JPanel {
             return super.getLocation();
         } else {
             return getLocation();
+        }
+    }
+
+    public void removeAllOutConnections() {
+        if (out_connector == null) return;
+        canvas.removeOutConnections(this);
+    }
+
+    public void removeAllInConnections() {
+        if (in_connector == null) return;
+        for (OutConnector connector : in_connector.connections) {
+            connector.destination = null;
+            canvas.removeOutConnections(connector.getParent());
         }
     }
 }

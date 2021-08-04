@@ -49,4 +49,9 @@ public class OutConnector extends JLabel {
     public void setDestination(InConnector connector) {
         destination = connector;
     }
+
+    public void removeConnection() {
+        destination = null;
+        parent.removeAllOutConnections();
+    }
 }

@@ -23,11 +23,11 @@ public class Node {
         this.children.add(newChild);
     }
 
-    public void removeChild(int childId){
-        for(Node item : this.children){
-            if(item.getId() == childId){
-                this.children.remove(item);
-            }
-        }
+    public void removeChild(Node node){
+        this.children.remove(node);
+    }
+
+    public void removeChildren() {
+        this.children.clear();
     }
 }

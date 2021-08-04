@@ -3,6 +3,8 @@ package Panels;
 import Frames.MainWindow;
 import Helpers.ComponentListener;
 import Helpers.OutConnector;
+import Nodes.Node;
+import Nodes.StartNode;
 
 import javax.swing.*;
 import java.awt.*;
@@ -10,6 +12,7 @@ import java.awt.*;
 public class StartPanel extends NodePanel{
 
     private final JLabel start_label;
+    private StartNode node;
 
     public StartPanel(MainWindow window, Point start) {
         super(window);
@@ -23,6 +26,11 @@ public class StartPanel extends NodePanel{
         out_connector = new OutConnector(this, window);
         add(out_connector);
         rescale(1, new Point(0, 0));
+    }
+
+    @Override
+    public void setNode(Node node) {
+        this.node = (StartNode) node;
     }
 
     @Override

@@ -4,6 +4,8 @@ import Frames.MainWindow;
 import Helpers.ComponentListener;
 import Helpers.InConnector;
 import Helpers.OutConnector;
+import Nodes.EndNode;
+import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +13,7 @@ import java.awt.*;
 public class EndPanel extends NodePanel{
 
     private final JLabel end_label;
+    private EndNode node;
 
     public EndPanel(MainWindow window, Point start) {
         super(window);
@@ -27,6 +30,11 @@ public class EndPanel extends NodePanel{
         add(in_connector);
 
         rescale(1, new Point(0, 0));
+    }
+
+    @Override
+    public void setNode(Node node) {
+        this.node = (EndNode) node;
     }
 
     @Override

@@ -8,15 +8,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class InConnector extends JLabel {
 
     private final NodePanel parent;
     private final MainWindow window;
+    public final List<OutConnector> connections;
 
     public InConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
+        connections = new LinkedList<>();
         rescale();
         addMouseListener(new InListener(window, this));
     }
@@ -44,5 +48,13 @@ public class InConnector extends JLabel {
         point.translate(getX(), getY());
         point.translate(getWidth()/2, getHeight()/2);
         return point;
+    }
+
+    public void removeConnections() {
+        parent.removeAllInConnections();
+    }
+
+    public void addConnection(NodePanel panel) {
+        connections.add(panel.getOutConnector());
     }
 }

@@ -2,6 +2,9 @@ package Managers;
 
 import Frames.MainWindow;
 
+import java.util.Collection;
+import java.util.List;
+
 public class TreeKeeper {
 
     private Project project;
@@ -41,5 +44,9 @@ public class TreeKeeper {
 
     public Character getCharacter(int id) {
         return project.people.get(id);
+    }
+
+    public Collection<Character> getCharacters() {
+        return project.people.values();
     }
 }

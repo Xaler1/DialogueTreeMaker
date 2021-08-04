@@ -3,6 +3,8 @@ package Panels;
 import Frames.MainWindow;
 import Helpers.OutConnector;
 import Managers.Graph;
+import Nodes.AnswerNode;
+import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,6 +13,7 @@ public class AnswerPanel extends NodePanel{
 
     private final JTextArea text_entry;
     private final JScrollPane pane;
+    private AnswerNode node;
 
     public AnswerPanel(MainWindow window, NodePanel parent, Graph graph, Point start) {
         super(window, parent, graph);
@@ -27,6 +30,11 @@ public class AnswerPanel extends NodePanel{
 
         setFocusable(true);
         rescale(1, new Point(0, 0));
+    }
+
+    @Override
+    public void setNode(Node node) {
+        this.node = (AnswerNode) node;
     }
 
     @Override

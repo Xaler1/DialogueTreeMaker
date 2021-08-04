@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class Graph{
 
     public String name;
-    private HashMap<Component, Integer> companantKeys = new HashMap<Component, Integer>();
+    private HashMap<Component, Integer> componentKeys = new HashMap<Component, Integer>();
     private HashMap<Integer, Node> idKeys = new HashMap<Integer, Node>();
     private int numNodes = 0;
 
@@ -24,7 +24,7 @@ public class Graph{
     private void addNode(Component elementUI, Node item) {
         this.numNodes += 1;
         item.setId(this.numNodes);
-        this.companantKeys.put(elementUI, this.numNodes);
+        this.componentKeys.put(elementUI, this.numNodes);
         this.idKeys.put(this.numNodes, item);
     }
 
@@ -45,11 +45,12 @@ public class Graph{
     }
 
     public Node getNode(Component itemElement){
-        return this.idKeys.get(this.companantKeys.get(itemElement));
+        return this.idKeys.get(this.componentKeys.get(itemElement));
     }
 
-    public void removeNode(int id) {
-
+    public void removeNode(Component node) {
+        idKeys.remove(componentKeys.get(node));
+        componentKeys.remove(node);
     }
 
     public void writeToFile() {

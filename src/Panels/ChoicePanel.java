@@ -5,6 +5,8 @@ import Helpers.ComponentListener;
 import Helpers.InConnector;
 import Helpers.OutConnector;
 import Managers.Graph;
+import Nodes.DialogueNode;
+import Nodes.Node;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -24,6 +26,7 @@ public class ChoicePanel extends NodePanel {
     private final JTextArea text_entry;
     private final JScrollPane pane;
     private final JLabel add_btn;
+    private DialogueNode node;
 
     public ChoicePanel(MainWindow window, Graph graph, Point start) {
         super(window, graph);
@@ -57,10 +60,15 @@ public class ChoicePanel extends NodePanel {
         rescale(1, new Point(0, 0));
     }
 
+    @Override
+    public void setNode(Node node) {
+        this.node = (DialogueNode) node;
+    }
+
     public NodePanel createAnswer() {
         AnswerPanel answer_panel = new AnswerPanel(window, this, graph, new Point(10, this.getHeight() - 10));
-
         answers.add(answer_panel);
+        answer_panel.setNode(graph.getNode(answer_panel));
         add(answer_panel);
         rescale(1, new Point(0, 0));
         return answer_panel;

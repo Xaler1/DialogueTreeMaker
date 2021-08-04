@@ -30,4 +30,11 @@ public class InListener extends MouseAdapter {
     public void mouseReleased(MouseEvent e) {
         window.endMouse();
     }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getButton() == MouseEvent.BUTTON1 && e.isAltDown()) {
+            component.removeConnections();
+        }
+    }
 }

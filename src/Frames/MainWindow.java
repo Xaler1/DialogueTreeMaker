@@ -22,7 +22,7 @@ import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 public class MainWindow extends JFrame implements MouseListener {
 
     private List<Graph> graphs;
-    private final TreeKeeper keeper;
+    public final TreeKeeper keeper;
 
     private boolean mouse_down = false;
 
@@ -46,6 +46,7 @@ public class MainWindow extends JFrame implements MouseListener {
     public final Font main_font = new Font("Serif", Font.PLAIN, 28);
 
     public NodePanel potential_end_component = null;
+    public String last_character = "";
 
     public boolean show_grid = true;
 
@@ -103,6 +104,16 @@ public class MainWindow extends JFrame implements MouseListener {
             public void stateChanged(ChangeEvent e) {
                 current_canvas = canvases.get(tabs.getSelectedIndex());
                 current_canvas.updateLines();
+            }
+        });
+
+        tabs.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyTyped(KeyEvent e) {
+                if (e.getKeyChar() == '\u007F') {
+                    current_canvas.deleteNode();
+                }
             }
         });
 

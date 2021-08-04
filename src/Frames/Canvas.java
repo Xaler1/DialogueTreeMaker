@@ -6,9 +6,7 @@ import Panels.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
@@ -17,9 +15,10 @@ import java.nio.channels.Pipe;
 import java.util.*;
 import java.util.List;
 
+//TODO: clean up this mess - make all the panel creation functions more or less the same order.
 public class Canvas extends JPanel implements PropertyChangeListener {
 
-    private final Graph graph;
+    public final Graph graph;
     public boolean has_start_node = false;
     public final List<NodePanel> components;
     private GridBagConstraints constraints;
@@ -71,6 +70,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
                 worker.execute();
             }
         });
+
     }
 
     public void addStartNode() {
@@ -80,36 +80,36 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         }
 
         StartPanel start_node = new StartPanel(window, this.getMousePosition());
-        this.add(start_node);
+        graph.addStartNode(start_node);
+        start_node.setNode(graph.getNode(start_node));
+        add(start_node);
         components.add(start_node);
-        //this.update(this.getGraphics());
         repaint();
         has_start_node = true;
-
-        graph.addStartNode(start_node);
     }
 
     public void addEndNode() {
         EndPanel end_node = new EndPanel(window, getMousePosition());
+        graph.addEndNode(end_node);
+        end_node.setNode(graph.getNode(end_node));
         this.add(end_node);
         components.add(end_node);
         repaint();
-
-        graph.addEndNode(end_node);
     }
 
     public void addDialogueNode() {
         DialoguePanel dialogue_node = new DialoguePanel(window, getMousePosition());
-
-        add(dialogue_node);
-        components.add(dialogue_node);
-        repaint();
         graph.addDialogueNode(dialogue_node, "Hello world");
+        dialogue_node.setNode(graph.getNode(dialogue_node));
+        components.add(dialogue_node);
+        add(dialogue_node);
+        repaint();
     }
 
     public void addChoiceNode() {
         ChoicePanel dialogue_node = new ChoicePanel(window, graph, getMousePosition());
         graph.addDialogueNode(dialogue_node, "Hello world");
+        dialogue_node.setNode(graph.getNode(dialogue_node));
         add(dialogue_node);
         components.add(dialogue_node);
         repaint();
@@ -137,6 +137,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     public void createLink(OutConnector out_connector, NodePanel component_end) {
         out_connector.setDestination(component_end.getInConnector());
+        component_end.getInConnector().addConnection(out_connector.getParent());
         updateLines();
         temp_line = null;
         graph.createRelation(out_connector.getParent(), component_end);
@@ -151,6 +152,32 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         start.translate(-source.x, -source.y);
         start.setLocation(start.x * mod, start.y * mod);
         start.translate(source.x, source.y);
+    }
+
+    public void removeOutConnections(NodePanel panel) {
+        graph.getNode(panel).removeChildren();
+    }
+
+    public void deleteNode() {
+        NodePanel to_remove = null;
+        for (NodePanel panel : components) {
+            Point point = panel.getMousePosition(true);
+            if (panel.contains(point)) {
+                panel.removeAllInConnections();
+                panel.removeAllOutConnections();
+                graph.removeNode(panel);
+                to_remove = panel;
+                break;
+            }
+        }
+        if (to_remove != null) {
+            remove(to_remove);
+            components.remove(to_remove);
+            if (to_remove instanceof StartPanel) {
+                has_start_node = false;
+            }
+        }
+        repaint();
     }
 
 
