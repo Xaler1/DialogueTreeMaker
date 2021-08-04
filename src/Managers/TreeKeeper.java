@@ -3,7 +3,6 @@ package Managers;
 import Frames.MainWindow;
 
 import java.util.Collection;
-import java.util.List;
 
 public class TreeKeeper {
 
@@ -16,12 +15,12 @@ public class TreeKeeper {
     }
 
     public int addCharacter(String name) {
-        for (Character character : project.people.values()) {
-            if (character.name.equals(name)) {
+        for (Person person : project.people.values()) {
+            if (person.name.equals(name)) {
                 return -1;
             }
         }
-        project.people.put(latest_id, new Character(latest_id, name));
+        project.people.put(latest_id, new Person(latest_id, name));
         latest_id++;
         return latest_id - 1;
     }
@@ -42,11 +41,18 @@ public class TreeKeeper {
         }
     }
 
-    public Character getCharacter(int id) {
+    public Person getPerson(int id) {
         return project.people.get(id);
     }
 
-    public Collection<Character> getCharacters() {
+    public Person getPersonByName(String name) {
+        for (Person person : project.people.values()) {
+            if (person.name.equals(name)) return person;
+        }
+        return null;
+    }
+
+    public Collection<Person> getPeople() {
         return project.people.values();
     }
 }

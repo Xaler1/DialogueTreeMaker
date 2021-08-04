@@ -32,7 +32,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        String name = evt.getPropertyName();
+        if (name.equals("name_change") || name.equals("person_create") || name.equals("person_delete")) {
+            refreshAll();
+        }
     }
 
     public Canvas(Graph graph, MainWindow window, Point2D default_scale) {
@@ -178,6 +181,12 @@ public class Canvas extends JPanel implements PropertyChangeListener {
             }
         }
         repaint();
+    }
+
+    public void refreshAll() {
+        for (NodePanel panel : components) {
+            panel.refresh();
+        }
     }
 
 

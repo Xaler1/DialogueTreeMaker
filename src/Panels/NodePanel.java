@@ -7,8 +7,6 @@ import Managers.Graph;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 import Frames.Canvas;
 import Managers.TreeKeeper;
@@ -60,6 +58,8 @@ public abstract class NodePanel extends JPanel {
     }
 
     public abstract void setNode(Node node);
+
+    public void refresh(){}
 
     private void setup() {
 

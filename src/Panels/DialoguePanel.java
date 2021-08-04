@@ -4,23 +4,23 @@ import Frames.MainWindow;
 import Helpers.ComponentListener;
 import Helpers.InConnector;
 import Helpers.OutConnector;
-import Managers.Character;
+import Managers.Person;
 import Nodes.DialogueNode;
 import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class DialoguePanel extends NodePanel{
 
     private final JTextArea text_entry;
     private final JScrollPane pane;
-    private final JComboBox<String> character_choice;
+    private final JComboBox<String> person_choice;
     private DialogueNode node;
+
+    private int person_id = -1;
+    private boolean refreshing = false;
 
     public DialoguePanel(MainWindow window, Point start) {
         super(window);
@@ -29,18 +29,18 @@ public class DialoguePanel extends NodePanel{
         setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
         addMouseListener(new ComponentListener(window, this));
 
-        character_choice = new JComboBox<>();
-        character_choice.addMouseListener(new MouseAdapter() {
+        person_choice = new JComboBox<>();
+        person_choice.addItemListener(new ItemListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                super.mouseClicked(e);
-                character_choice.removeAllItems();
-                for (Character character : keeper.getCharacters()) {
-                    character_choice.addItem(character.name);
-                }
+            public void itemStateChanged(ItemEvent e) {
+                if (refreshing) return;
+                Person person = keeper.getPersonByName((String)(person_choice.getSelectedItem()));
+                node.setPerson(person);
+                if (person == null) return;
+                person_id = person.id;
             }
         });
-        add(character_choice);
+        add(person_choice);
 
         text_entry = new JTextArea("Hello world!");
         text_entry.setLineWrap(true);
@@ -66,14 +66,34 @@ public class DialoguePanel extends NodePanel{
     @Override
     public void setNode(Node node) {
         this.node = (DialogueNode) node;
+        refresh();
+    }
+
+    @Override
+    public void refresh() {
+        refreshing = true;
+        boolean contains_old = false;
+        person_choice.removeAllItems();
+        for (Person person : keeper.getPeople()) {
+            person_choice.addItem(person.name);
+            if (person.id == person_id) {
+                person_choice.setSelectedItem(person.name);
+                contains_old = true;
+            }
+        }
+        if (!contains_old) {
+            node.removeCharacter();
+            person_id = -1;
+        }
+        refreshing = false;
     }
 
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);
         setSize((int)(300 * canvas.scale.getX()), (int)(150 * canvas.scale.getY()));
-        character_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
-        character_choice.setBounds((int)(40 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
+        person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
+        person_choice.setBounds((int)(40 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         pane.setBounds((int)(40 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(100 * canvas.scale.getY()));
         in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));

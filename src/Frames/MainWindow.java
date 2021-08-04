@@ -1,6 +1,5 @@
 package Frames;
 
-import Managers.Character;
 import Managers.TreeKeeper;
 import Panels.NodePanel;
 import Helpers.OutConnector;
@@ -15,8 +14,6 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 
 
 public class MainWindow extends JFrame implements MouseListener {
@@ -38,7 +35,7 @@ public class MainWindow extends JFrame implements MouseListener {
 
     private final List<Canvas> canvases;
     public Canvas current_canvas = null;
-    private CharacterPanel character_panel;
+    private PersonPanel character_panel;
     private Variables variables_panel;
     MainWindow self;
     private Point2D scale;
@@ -182,7 +179,7 @@ public class MainWindow extends JFrame implements MouseListener {
         tabs.setPreferredSize(new Dimension(1000, 600));
         setJMenuBar(menu_bar);
         add(tabs, constraints);
-        character_panel = new CharacterPanel(keeper);
+        character_panel = new PersonPanel(keeper);
         character_panel.setPreferredSize(new Dimension(100, 300));
         variables_panel = new Variables();
         variables_panel.setPreferredSize(new Dimension(100, 300));
@@ -321,6 +318,7 @@ public class MainWindow extends JFrame implements MouseListener {
         Graph new_graph = new Graph(name);
         graphs.add(new_graph);
         Canvas new_canvas = new Canvas(new_graph, self, scale);
+        character_panel.addListener(new_canvas);
         new_canvas.addMouseListener(self);
         new_canvas.setBackground(Color.WHITE);
         new_canvas.setComponentPopupMenu(right_click_menu);

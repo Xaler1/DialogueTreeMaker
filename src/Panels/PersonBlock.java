@@ -1,30 +1,31 @@
 package Panels;
 
 import Frames.CharacterEditWindow;
-import Frames.CharacterPanel;
+import Frames.PersonPanel;
 import Managers.TreeKeeper;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class CharacterBlock extends JPanel {
+public class PersonBlock extends JPanel implements PropertyChangeListener {
 
     private final TreeKeeper keeper;
 
     private JLabel name_label;
 
-    public final CharacterBlock self;
-    private final CharacterPanel parent;
+    public final PersonBlock self;
     public final int id;
 
-    public CharacterBlock(int id, TreeKeeper keeper, CharacterPanel parent) {
+    public PersonBlock(int id, TreeKeeper keeper, PersonPanel parent) {
         this.keeper = keeper;
         this.self = this;
-        this.parent = parent;
         this.id = id;
         String name = keeper.getCharacterName(id);
+        keeper.getPerson(id).addListener(this);
         setBackground(Color.WHITE);
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -43,6 +44,7 @@ public class CharacterBlock extends JPanel {
             actual = name + "  ".repeat(20 - name.length());
         }
         name_label = new JLabel(actual);
+        name_label.setPreferredSize(new Dimension(100, 30));
         add(name_label, constraints);
 
         JButton button = new JButton("M");
@@ -56,6 +58,7 @@ public class CharacterBlock extends JPanel {
         });
         constraints.gridx = 1;
         constraints.anchor = GridBagConstraints.EAST;
+        button.setPreferredSize(new Dimension(30, 30));
         add(button, constraints);
 
         constraints.gridx = 2;
@@ -66,22 +69,14 @@ public class CharacterBlock extends JPanel {
                 parent.remove_character(self);
             }
         });
+        button.setPreferredSize(new Dimension(30, 30));
         add(button, constraints);
     }
 
     @Override
-    public void repaint() {
-        try {
-            String name = keeper.getCharacterName(id);
-            String actual = name.substring(0);
-            if (name.length() > 20) {
-                actual = name.substring(0, 17) +  "...  ";
-            }
-            if (name.length() < 20) {
-                actual = name + "  ".repeat(20 - name.length());
-            }
-            name_label.setText(actual);
-        } catch (NullPointerException ex) {}
-        super.repaint();
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals("name_change")) {
+            name_label.setText((String) evt.getNewValue());
+        }
     }
 }

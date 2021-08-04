@@ -2,7 +2,7 @@ package Panels;
 
 import Frames.CharacterEditWindow;
 import Helpers.Property;
-import Managers.Character;
+import Managers.Person;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -24,7 +24,7 @@ public class PropertyBlock extends JPanel {
     private JComboBox<String> type_selector;
     private JComboBox<Boolean> bool_selector;
 
-    public PropertyBlock(Property property, Character character, CharacterEditWindow parent) {
+    public PropertyBlock(Property property, Person person, CharacterEditWindow parent) {
         this.self = this;
         this.parent = parent;
         this.property = property;
@@ -109,7 +109,7 @@ public class PropertyBlock extends JPanel {
         remove_btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                character.properties.remove(property.id);
+                person.properties.remove(property.id);
                 parent.remove_property(self);
             }
         });

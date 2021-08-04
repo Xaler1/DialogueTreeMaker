@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class Project {
     public List<Graph> graphs;
-    public Map<Integer, Character> people;
+    public Map<Integer, Person> people;
     public String name;
 
     public Project(String name) {

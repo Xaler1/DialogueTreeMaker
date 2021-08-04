@@ -1,28 +1,26 @@
 package Frames;
 
 import Helpers.Property;
-import Managers.Character;
-import Managers.Project;
+import Managers.Person;
 import Managers.TreeKeeper;
 import Panels.PropertyBlock;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 public class CharacterEditWindow extends JDialog {
 
     private final TreeKeeper keeper;
     private final int id;
-    private final Character character;
+    private final Person person;
 
     private JLabel image;
     private JTextField name_entry;
@@ -32,7 +30,7 @@ public class CharacterEditWindow extends JDialog {
     public CharacterEditWindow(int id, TreeKeeper keeper) {
         this.keeper = keeper;
         this.id = id;
-        this.character = keeper.getCharacter(id);
+        this.person = keeper.getPerson(id);
         setModal (true);
         setAlwaysOnTop (true);
         setModalityType (ModalityType.APPLICATION_MODAL);
@@ -42,7 +40,7 @@ public class CharacterEditWindow extends JDialog {
         constraints.gridx = 1;
         constraints.gridy = 0;
 
-        Image img = character.image;
+        Image img = person.image;
         if (img == null) {
             try {
                 img = ImageIO.read(new File("imgs/default_char.png"));
@@ -71,7 +69,7 @@ public class CharacterEditWindow extends JDialog {
         constraints.gridy = 1;
         name_entry = new JTextField();
         name_entry.setFont(name_entry.getFont().deriveFont(24f));
-        name_entry.setText(character.name);
+        name_entry.setText(person.name);
         name_entry.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
@@ -79,7 +77,7 @@ public class CharacterEditWindow extends JDialog {
                 checkName();
             }
         });
-        current_name = character.name;
+        current_name = person.name;
         add(name_entry, constraints);
 
         constraints.gridy = 2;
@@ -93,7 +91,7 @@ public class CharacterEditWindow extends JDialog {
         property_btn.setFont(property_btn.getFont().deriveFont(20f));
         add(property_btn, constraints);
 
-        for (Property property : character.properties.values()) {
+        for (Property property : person.properties.values()) {
             addProperty(property);
         }
     }
@@ -111,8 +109,8 @@ public class CharacterEditWindow extends JDialog {
         }
         try {
             Image img = ImageIO.read(file);
-            character.image = img;
-            character.img_name = file.getName();
+            person.image = img;
+            person.img_name = file.getName();
             float height = img.getHeight(this);
             float width = img.getWidth(this);
             if (width > height) {
@@ -133,7 +131,7 @@ public class CharacterEditWindow extends JDialog {
     private void addProperty(Property property) {
         if (property != null) {
             constraints.gridy++;
-            add(new PropertyBlock(property, character, this), constraints);
+            add(new PropertyBlock(property, person, this), constraints);
             return;
         }
         while (true) {
@@ -156,12 +154,12 @@ public class CharacterEditWindow extends JDialog {
                 JOptionPane.showMessageDialog(this, "Invalid name", "The name cannot contain spaces", JOptionPane.ERROR_MESSAGE);
             } else {
                 constraints.gridy++;
-                property = character.addProperty(name);
+                property = person.addProperty(name);
                 if (property == null) {
                     JOptionPane.showMessageDialog(this, "Invalid name", "Cannot have duplicate property names", JOptionPane.ERROR_MESSAGE);
                     continue;
                 }
-                add(new PropertyBlock(property, character, this), constraints);
+                add(new PropertyBlock(property, person, this), constraints);
                 break;
             }
         }
@@ -180,7 +178,7 @@ public class CharacterEditWindow extends JDialog {
         if (new_name.length() != 0) {
             current_name = new_name;
         }
-        character.name = current_name;
+        person.setName(current_name);
         name_entry.setText(current_name);
     }
 }
