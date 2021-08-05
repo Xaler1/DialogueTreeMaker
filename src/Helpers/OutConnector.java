@@ -18,6 +18,7 @@ public class OutConnector extends JLabel {
     public OutConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
+        setPreferredSize(new Dimension(30, 30));
         try {
             source_img = ImageIO.read(new File("imgs/out_connector.png"));
         } catch (IOException ex) {}
@@ -41,7 +42,7 @@ public class OutConnector extends JLabel {
         Image scaled = source_img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaled);
         setIcon(icon);
-        setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
+        //setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
     public void setDestination(InConnector connector) {
@@ -51,5 +52,11 @@ public class OutConnector extends JLabel {
     public void removeConnection() {
         destination = null;
         parent.removeAllOutConnections();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        //g.drawImage()
     }
 }

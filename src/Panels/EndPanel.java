@@ -17,17 +17,29 @@ public class EndPanel extends NodePanel{
 
     public EndPanel(MainWindow window, Point start) {
         super(window);
+        setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 0.3;
+        constraints.weighty = 1;
+        constraints.insets = new Insets(0, 1, 0, 1);
         setLocation(start);
 
         setBorder(BorderFactory.createMatteBorder(2, 2, 2, 5, Color.red));
         setBackground(Color.lightGray);
         addMouseListener(new ComponentListener(window, this));
 
-        end_label = new JLabel("End");
-        add(end_label);
-
         in_connector = new InConnector(this, window);
-        add(in_connector);
+        in_connector.setPreferredSize(new Dimension(30, 30));
+        add(in_connector, constraints);
+
+        constraints.gridx = 1;
+        constraints.weightx = 1;
+        end_label = new JLabel("End");
+        end_label.setPreferredSize(new Dimension(100, 30));
+        add(end_label, constraints);
 
         rescale(1, new Point(0, 0));
     }
@@ -42,8 +54,8 @@ public class EndPanel extends NodePanel{
         super.rescale(mod, source);
         setSize((int)(120 * canvas.scale.getX()), (int)(50 * canvas.scale.getY()));
         end_label.setFont(window.main_font.deriveFont((float) (28.0f * canvas.scale.getX())));
-        end_label.setBounds((int)(40 * canvas.scale.getX()), (int)(5 * canvas.scale.getY()), (int)(70 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()));
-        in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()));
+        //end_label.setBounds((int)(40 * canvas.scale.getX()), (int)(5 * canvas.scale.getY()), (int)(70 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()));
+        //in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()));
         in_connector.rescale();
     }
 }

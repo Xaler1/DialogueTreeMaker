@@ -218,7 +218,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     public void deleteNode() {
         NodePanel to_remove = null;
         for (NodePanel panel : components) {
-            Point point = panel.getMousePosition(true);
+            Point point = getMousePosition();
+            Point loc = panel.getLocation();
+            point.translate(-loc.x, -loc.y);
             if (panel.contains(point)) {
                 panel.removeAllInConnections();
                 panel.removeAllOutConnections();
@@ -262,9 +264,12 @@ public class Canvas extends JPanel implements PropertyChangeListener {
             painter.draw(temp_line);
         }
         for (NodePanel panel : components) {
+            painter.setStroke(new BasicStroke(4f));
+            painter.setPaint(Color.GREEN);
             if (panel.getOutConnector() != null && panel.getOutConnector().destination != null) {
                 painter.draw(new Line2D.Float(panel.getOutConnector().getCenter(), panel.getOutConnector().destination.getCenter()));
             }
+            painter.setPaint(Color.BLACK);
         }
         if (window.show_grid) {
             painter.setStroke(new BasicStroke((float) scale.getX()));

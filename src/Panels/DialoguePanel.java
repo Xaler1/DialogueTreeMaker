@@ -22,8 +22,17 @@ public class DialoguePanel extends NodePanel{
     private int person_id = -1;
     private boolean refreshing = false;
 
+    //TODO: Find a way so that the connectors are the same size as they are visually.
     public DialoguePanel(MainWindow window, Point start) {
         super(window);
+        setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 1;
+        constraints.gridy = 0;
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weightx = 1.9;
+        constraints.weighty = 0.1;
+        constraints.anchor = GridBagConstraints.CENTER;
 
         setLocation(start.x, start.y);
         setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
@@ -40,8 +49,12 @@ public class DialoguePanel extends NodePanel{
                 person_id = person.id;
             }
         });
-        add(person_choice);
+        person_choice.setPreferredSize(new Dimension(190, 10));
+        add(person_choice, constraints);
 
+        constraints.gridy = 1;
+        constraints.gridheight = 3;
+        constraints.weighty = 0.5;
         text_entry = new JTextArea("Hello world!");
         text_entry.setLineWrap(true);
         text_entry.addKeyListener(new KeyAdapter() {
@@ -52,13 +65,20 @@ public class DialoguePanel extends NodePanel{
             }
         });
         pane = new JScrollPane(text_entry);
-        add(pane);
+        pane.setPreferredSize(new Dimension(170, 50));
+        add(pane, constraints);
 
+        constraints.gridx = 0;
+        constraints.weightx = 0.3;
+        constraints.weighty = 0.3;
+        constraints.gridheight = 1;
+        constraints.fill = GridBagConstraints.BOTH;
         in_connector = new InConnector(this, window);
-        add(in_connector);
+        add(in_connector, constraints);
 
+        constraints.gridx = 2;
         out_connector = new OutConnector(this, window);
-        add(out_connector);
+        add(out_connector, constraints);
 
         rescale(1, new Point(0, 0));
     }
@@ -93,12 +113,12 @@ public class DialoguePanel extends NodePanel{
         super.rescale(mod, source);
         setSize((int)(300 * canvas.scale.getX()), (int)(150 * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
-        person_choice.setBounds((int)(40 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
+        //person_choice.setBounds((int)(40 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
-        pane.setBounds((int)(40 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(100 * canvas.scale.getY()));
-        in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));
+        //pane.setBounds((int)(40 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(100 * canvas.scale.getY()));
+        //in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));
         in_connector.rescale();
-        out_connector.setLocation((int)(255 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));
+        //out_connector.setLocation((int)(255 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));
         out_connector.rescale();
     }
 }

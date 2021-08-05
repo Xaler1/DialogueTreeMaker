@@ -26,6 +26,7 @@ public class InConnector extends JLabel {
     public InConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
+        setPreferredSize(new Dimension(30, 30));
         connections = new LinkedList<>();
         try {
             source_img = ImageIO.read(new File("imgs/in_connector.png"));
@@ -42,7 +43,7 @@ public class InConnector extends JLabel {
         Image scaled = source_img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaled);
         setIcon(icon);
-        setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
+        //setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
     /*
