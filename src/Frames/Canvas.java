@@ -17,7 +17,8 @@ import java.util.List;
 
 //TODO: clean up this mess - make all the panel creation functions more or less the same order.
 /*
-    Test2
+    This class holds and draws the main representation of a dialogue graph. It is responsible for creating and managing
+    the visual representations of the nodes of the graph.
  */
 public class Canvas extends JPanel implements PropertyChangeListener {
 
@@ -33,6 +34,11 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     public Point2D scale;
     private Point start = new Point(0, 0);
 
+    /*
+        This detects when there has been a change in any of the people in the project and tells all of the nodes to refresh
+        to update with this new change.
+        //TODO: make the call more specific so that only person-related things update.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         String name = evt.getPropertyName();
@@ -41,6 +47,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         }
     }
 
+    /*
+        This constructs the canvas
+     */
     public Canvas(Graph graph, MainWindow window, Point2D default_scale) {
         this.graph = graph;
         components = new ArrayList<>();
@@ -52,6 +61,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         setFocusable(true);
         requestFocusInWindow();
 
+        /*
+            This creates a mouse wheel listener that detects when the user wants to zoom in/out and moves all the nodes
+            as well as telling them to rescale. The grid reference point is also moved.
+         */
         addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
@@ -79,6 +92,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
 
     }
 
+    /*
+        This creates a new start node visually as well as a corresponding start node in the graph.
+        Before that it also checks that there isn't already a start node on this graph.
+     */
     public void addStartNode() {
         if (has_start_node) {
             JOptionPane.showMessageDialog(this, "A single graph cannot have more than one start node.", "Start node already in graph", JOptionPane.PLAIN_MESSAGE);
@@ -94,6 +111,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         has_start_node = true;
     }
 
+    /*
+        This creates a new end node visually (a panel) as well as a corresponding end node in the graph.
+     */
     public void addEndNode() {
         EndPanel end_node = new EndPanel(window, getMousePosition());
         graph.addEndNode(end_node);
@@ -103,6 +123,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    /*
+        This creates a new dialogue node visually (a panel) as well as a corresponding end node in the graph.
+     */
     public void addDialogueNode() {
         DialoguePanel dialogue_node = new DialoguePanel(window, getMousePosition());
         graph.addDialogueNode(dialogue_node, "Hello world");
@@ -112,6 +135,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    /*
+        This creates a new choice node visually (a panel) as well as a corresponding end node in the graph.
+     */
     public void addChoiceNode() {
         ChoicePanel dialogue_node = new ChoicePanel(window, graph, getMousePosition());
         graph.addDialogueNode(dialogue_node, "Hello world");
@@ -121,6 +147,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    /*
+        This moves all of the node panels on the graph together as well as the grid to create the effect of dragging along the
+        surface.
+     */
     public void translateAll(Point offset) {
         for (JComponent component : components) {
             if (!(component instanceof AnswerPanel)) {
@@ -133,6 +163,9 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         updateLines();
     }
 
+    /*
+        This moves a specific node panel around with the user's mouse.
+     */
     public void relocatedNode(Component component, Point loc) {
         Point old = component.getLocation();
         Point holder = loc.getLocation();
@@ -141,6 +174,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         updateLines();
     }
 
+    /*
+        The creates a visual link between an out connector and the in connector of a another node panel. Since each
+        node panel has only one in connector - specifying the panel is enough.
+     */
     public void createLink(OutConnector out_connector, NodePanel component_end) {
         out_connector.setDestination(component_end.getInConnector());
         component_end.getInConnector().addConnection(out_connector.getParent());
@@ -149,21 +186,35 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         graph.createRelation(out_connector.getParent(), component_end);
     }
 
+    /*
+        //TODO: probably remove since it doesn't look like anything extra needs to be done.
+     */
     public void updateLines() {
         //removeAll();
         repaint();
     }
 
+    /*
+        Moves around the reference point for the grid to create the illusion of the grid being moved around.
+     */
     private void translateStart(float mod, Point source) {
         start.translate(-source.x, -source.y);
         start.setLocation(start.x * mod, start.y * mod);
         start.translate(source.x, source.y);
     }
 
+    /*
+        Removes all the out connections of the given node on the graph.
+        All of the visual connections are removed inside the panel itself, which is what calls this.
+     */
     public void removeOutConnections(NodePanel panel) {
         graph.getNode(panel).removeChildren();
     }
 
+    /*
+        This attempts to delete a node both visually and from the graph. First it checks which (if any) node contains
+        the user's cursor. Then it removes all of its connections both in an out and then removes the node and panel themselves.
+     */
     public void deleteNode() {
         NodePanel to_remove = null;
         for (NodePanel panel : components) {
@@ -186,6 +237,10 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         repaint();
     }
 
+    /*
+        This tells all the visual node panels to refresh.
+        //TODO: create more specific arguments to differentiate between things that need to be refreshed.
+     */
     public void refreshAll() {
         for (NodePanel panel : components) {
             panel.refresh();
@@ -193,6 +248,12 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     }
 
 
+    /*
+        First - if the user is creating a new connection between two nodes then it draws a temporary line from the out
+        connector to the user's cursor. Next if draws all of the existing connections by looking at all the destinations
+        of all the out connectors of all the panels. Finally (if it is enabled) it draws the grid offset by what
+        is effectively a 2D mod function of a reference point - start.
+     */
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);

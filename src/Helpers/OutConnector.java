@@ -13,10 +13,14 @@ public class OutConnector extends JLabel {
     private final NodePanel parent;
     private final MainWindow window;
     public InConnector destination;
+    private Image source_img;
 
     public OutConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
+        try {
+            source_img = ImageIO.read(new File("imgs/out_connector.png"));
+        } catch (IOException ex) {}
         rescale();
         addMouseListener(new OutListener(window, this));
     }
@@ -34,13 +38,7 @@ public class OutConnector extends JLabel {
     }
 
     public void rescale() {
-        Image img = null;
-        try {
-            img = ImageIO.read(new File("imgs/out_connector.png"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        Image scaled = img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
+        Image scaled = source_img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaled);
         setIcon(icon);
         setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));

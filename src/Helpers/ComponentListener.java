@@ -6,6 +6,9 @@ import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/*
+    This detects when a user presses on a panel on a canvas and starts the relocation loop for that panel in the main window.
+ */
 public class ComponentListener extends MouseAdapter {
     private final MainWindow window;
     private final JPanel panel;

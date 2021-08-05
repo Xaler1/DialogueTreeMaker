@@ -16,6 +16,10 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
+/*
+    This is a window for editing a specific character. The user can choose a picture, change the name and also add
+    custom properties to the character.
+ */
 public class CharacterEditWindow extends JDialog {
 
     private final TreeKeeper keeper;
@@ -27,6 +31,11 @@ public class CharacterEditWindow extends JDialog {
     private String current_name;
     private final GridBagConstraints constraints = new GridBagConstraints();
 
+    /*
+        This assembles the initial window - with a picture that can be clicked for changing the image and a text field
+        for editing the name. Also, if the character has any properties then they are added below in sequence.
+        All the changes to the name, picture and properties are in real time.
+     */
     public CharacterEditWindow(int id, TreeKeeper keeper) {
         this.keeper = keeper;
         this.id = id;
@@ -96,6 +105,10 @@ public class CharacterEditWindow extends JDialog {
         }
     }
 
+    /*
+        This processes the selection of a new image for the character. It opens a file chooser with a filter for images
+        only and then attempts to set the selected image - resizing it to it in the window without stretching it.
+     */
     private void selectNewIcon() {
         final JFileChooser chooser = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("Images", "jpg", "png", "jpeg");
@@ -128,6 +141,11 @@ public class CharacterEditWindow extends JDialog {
         }
     }
 
+    /*
+        This adds a new property to the character and a visual property block to the window.
+        It prompts the user to enter a default name for the property (it only allows non-empty names with no spaces and
+        which are not duplicates)
+     */
     private void addProperty(Property property) {
         if (property != null) {
             constraints.gridy++;
@@ -166,6 +184,9 @@ public class CharacterEditWindow extends JDialog {
         pack();
     }
 
+    /*
+        This removes the visual property block from the window and asks it to resize to remove any empty space.
+     */
     public void remove_property(PropertyBlock block) {
         remove(block);
         revalidate();
@@ -173,6 +194,10 @@ public class CharacterEditWindow extends JDialog {
         pack();
     }
 
+    /*
+        This checks that the name being entered is valid (i.e. not empty) and either reverts to the previous name or
+        accepts the new one.
+     */
     private void checkName() {
         String new_name = name_entry.getText();
         if (new_name.length() != 0) {

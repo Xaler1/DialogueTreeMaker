@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+/*
+    This is the class that assembles the main window and is responsible for handing most project management operations.
+ */
 public class MainWindow extends JFrame implements MouseListener {
 
     private List<Graph> graphs;
@@ -47,6 +50,9 @@ public class MainWindow extends JFrame implements MouseListener {
 
     public boolean show_grid = true;
 
+    /*
+        This assembles the main window.
+     */
     public MainWindow(List<Graph> graphs, String name, TreeKeeper keeper) {
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
@@ -62,6 +68,7 @@ public class MainWindow extends JFrame implements MouseListener {
         this.graphs = graphs;
         this.keeper = keeper;
 
+        //This right click menu.
         right_click_menu = new JPopupMenu();
         JMenuItem item = new JMenuItem("Start node");
         item.addActionListener(new ActionListener() {
@@ -104,8 +111,8 @@ public class MainWindow extends JFrame implements MouseListener {
             }
         });
 
+        //This detects when the user presses the delete key and tells the current canvas to attempt to delete a node.
         tabs.addKeyListener(new KeyAdapter() {
-
             @Override
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == '\u007F') {
@@ -114,6 +121,7 @@ public class MainWindow extends JFrame implements MouseListener {
             }
         });
 
+        //This section assembles the top menu bar.
         menu = new JMenu("File");
         menu_bar.add(menu);
 
@@ -168,6 +176,7 @@ public class MainWindow extends JFrame implements MouseListener {
             createCanvas(graph.name);
         }
 
+        //This section assembles the main portion of the window.
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.gridheight = 2;
@@ -197,6 +206,8 @@ public class MainWindow extends JFrame implements MouseListener {
         setVisible(true);
         setTitle(name);
 
+        //TODO: doesn't really work as the tabs for some reason always have to focus and so can be changed by pressing
+        //the keys anyway.
         this.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
@@ -209,10 +220,16 @@ public class MainWindow extends JFrame implements MouseListener {
         });
     }
 
+    //What ever Zinks2 is doing.
     public void saveAsJson() {
         System.out.println("RAN!");
     }
 
+    /*
+        This tracks the relocation of a component on the canvas by tracking the user's mouse until it is released.
+        The movement only happens at most - every 10 milliseconds and also only if the user has moved the mouse to avoid
+        flickering.
+     */
     public void trackRelocate(JComponent component) {
         Point offset = component.getMousePosition();
         mouse_down = true;
@@ -235,6 +252,11 @@ public class MainWindow extends JFrame implements MouseListener {
         worker.execute();
     }
 
+    /*
+        This tracks the relocation of the entire canvas (i.e. all the components on the canvas together) by tracking
+        the user's mouse until the left mouse button is released. The movement only happens at most - every 10
+        milliseconds and also only if the user has moved the mouse to avoid flickering.
+     */
     private void trackGrab() {
         SwingWorker worker = new SwingWorker() {
             @Override
@@ -256,6 +278,13 @@ public class MainWindow extends JFrame implements MouseListener {
         worker.execute();
     }
 
+    /*
+        This tracks the connection of two nodes - triggered if the user has pressed the left mouse button over an
+        out connector. It follows the user's mouse and tells the canvas to draw a temporary line showing where the
+        connection is currently going. Once the user releases the left mouse button it checks whether the mouse has entered
+        any in connectors and if it has then it tells the canvas to create a connection. Otherwise, the temporary line
+        is discarded.
+     */
     public void trackConnect(OutConnector component, Point start) {
         mouse_down = true;
         SwingWorker worker = new SwingWorker() {
@@ -278,6 +307,10 @@ public class MainWindow extends JFrame implements MouseListener {
         worker.execute();
     }
 
+    /*
+        This creates a new canvas - first asking the user for its name. Only non-empty, non-duplicate names with
+        no spaces or dots are allowed.
+     */
     private void createCanvas(String name) {
         if (name.equals("")) {
             while (true) {
@@ -341,6 +374,9 @@ public class MainWindow extends JFrame implements MouseListener {
         }
     }
 
+    /*
+        Sets the mouse down flag to false, to stop any movement tracking loops.
+     */
     @Override
     public void mouseReleased(MouseEvent e) {
         mouse_down = false;
@@ -351,6 +387,9 @@ public class MainWindow extends JFrame implements MouseListener {
 
     }
 
+    /*
+        Also sets the mouse down flag to false, to stop any movement tracking loops in case the mouse leaves the canvas.
+     */
     @Override
     public void mouseExited(MouseEvent e) {
         Point loc = MouseInfo.getPointerInfo().getLocation();
@@ -360,6 +399,10 @@ public class MainWindow extends JFrame implements MouseListener {
         }
     }
 
+    /*
+        Provides a public method for setting the mouse down flag to false in case the mouse was released over some other
+        element.
+     */
     public void endMouse() {
         mouse_down = false;
     }

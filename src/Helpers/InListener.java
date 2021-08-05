@@ -7,6 +7,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/*
+    This handles mouse operations on in connectors - setting it as a potential end point for a link being created,
+    deleting all the connections.
+ */
 public class InListener extends MouseAdapter {
     private final MainWindow window;
     private final InConnector component;
@@ -16,6 +20,10 @@ public class InListener extends MouseAdapter {
         this.component = component;
     }
 
+    /*
+        This detects when the user's mouse enters the in connector and sets it as a potential end point for a connection
+        being made.
+     */
     @Override
     public void mouseEntered(MouseEvent e) {
         window.potential_end_component = component.getParent();
