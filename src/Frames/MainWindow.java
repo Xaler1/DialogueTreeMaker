@@ -13,6 +13,8 @@ import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -162,14 +164,37 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_bar.add(menu);
         JCheckBoxMenuItem check_item = new JCheckBoxMenuItem("Show grid");
         check_item.setSelected(true);
-        check_item.addChangeListener(new ChangeListener() {
+        check_item.addItemListener(new ItemListener() {
             @Override
-            public void stateChanged(ChangeEvent e) {
+            public void itemStateChanged(ItemEvent e) {
                 show_grid = check_item.getState();
-                current_canvas.updateLines();
+                for (Canvas canvas : canvases) {
+                    canvas.updateLines();
+                }
             }
         });
         menu.add(check_item);
+        JLabel label = new JLabel("Performance");
+        menu.add(label);
+        JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 11, 1);
+        slider.setSnapToTicks(true);
+        slider.setPaintTicks(true);
+        slider.setPaintLabels(true);
+        slider.setMajorTickSpacing(1);
+        Dictionary<Integer, JComponent> labels = new Hashtable<>();
+        labels.put(1, new JLabel("Low"));
+        labels.put(6, new JLabel("Med"));
+        labels.put(11, new JLabel("High"));
+        slider.setLabelTable(labels);
+        slider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                for (Canvas canvas : canvases) {
+                    canvas.num_workers = slider.getValue();
+                }
+            }
+        });
+        menu.add(slider);
 
         canvases = new ArrayList<>();
         for (Graph graph : graphs) {

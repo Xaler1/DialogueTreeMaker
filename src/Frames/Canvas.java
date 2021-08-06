@@ -29,6 +29,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     private Font main_font;
     private final MainWindow window;
     private Graphics2D painter;
+    public int num_workers = 5;
 
     public Line2D temp_line = null;
     public Point2D scale;
@@ -68,25 +69,29 @@ public class Canvas extends JPanel implements PropertyChangeListener {
         addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                SwingWorker worker = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        float mod = -.05f;
-                        if (e.getUnitsToScroll() < 0) {
-                            mod = .05f;
+                float mod = -.05f;
+                if (e.getUnitsToScroll() < 0) {
+                    mod = .05f;
+                }
+                double old = scale.getX();
+                scale.setLocation(Math.min(Math.max(0.3, scale.getX() + mod), 3), Math.min(Math.max(0.3, scale.getY() + mod), 3));
+                float diff = (float) (scale.getX() / old);
+                translateStart(diff, getMousePosition());
+                updateLines();
+                List<NodePanel> groups = new LinkedList<>(components);
+                for (int x = 0; x < num_workers; x++) {
+                    SwingWorker worker = new SwingWorker() {
+                        @Override
+                        protected Object doInBackground() throws Exception {
+                            while(groups.size() > 0) {
+                                NodePanel panel = groups.remove(0);
+                                panel.rescale(diff, getMousePosition());
+                            }
+                            return null;
                         }
-                        double old = scale.getX();
-                        scale.setLocation(Math.min(Math.max(0.3, scale.getX() + mod), 3), Math.min(Math.max(0.3, scale.getY() + mod), 3));
-                        float diff = (float) (scale.getX() / old);
-                        translateStart(diff, getMousePosition());
-                        updateLines();
-                        for (NodePanel panel : components) {
-                            panel.rescale(diff, getMousePosition());
-                        }
-                        return null;
-                    }
-                };
-                worker.execute();
+                    };
+                    worker.execute();
+                }
             }
         });
 
