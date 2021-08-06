@@ -3,18 +3,24 @@ package Panels;
 import Frames.MainWindow;
 import Helpers.ComponentListener;
 import Helpers.InConnector;
-import Helpers.OutConnector;
 import Nodes.EndNode;
 import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
 
+/*
+    This is a visual representation of an end panel. It only has an in connector.
+ */
 public class EndPanel extends NodePanel{
 
     private final JLabel end_label;
     private EndNode node;
 
+
+    /*
+        This assembles the panel using a gridbag layout.
+     */
     public EndPanel(MainWindow window, Point start) {
         super(window);
         setLayout(new GridBagLayout());
@@ -49,6 +55,10 @@ public class EndPanel extends NodePanel{
         this.node = (EndNode) node;
     }
 
+    /*
+        This resizes the panel and the font to fit under the new zoom level.
+        //TODO: add border resizing.
+     */
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);

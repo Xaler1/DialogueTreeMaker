@@ -9,12 +9,20 @@ import Nodes.Node;
 import javax.swing.*;
 import java.awt.*;
 
+/*
+    This is a visual representation of an answer node. Users can use this to add answer text, remove this node or connect it
+    to another node. Conceptually it is the same as a dialogue node, however visually it is stored directly inside a choice
+    to which it is connected directly.
+ */
 public class AnswerPanel extends NodePanel{
 
     private final JTextArea text_entry;
     private final JScrollPane pane;
     private AnswerNode node;
 
+    /*
+        This assembles the panel using a gridbag.
+     */
     public AnswerPanel(MainWindow window, NodePanel parent, Graph graph, Point start) {
         super(window, parent, graph);
         setLayout(new GridBagLayout());
@@ -47,6 +55,10 @@ public class AnswerPanel extends NodePanel{
         this.node = (AnswerNode) node;
     }
 
+    /*
+        Rescales the font and asks the out connector to rescale to fit the new zoom level.
+        //TODO: add border resizing.
+     */
     @Override
     public void rescale(float mod, Point source) {
         text_entry.setFont(window.main_font.deriveFont((float) (18 * canvas.scale.getX())));

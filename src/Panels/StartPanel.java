@@ -6,18 +6,21 @@ import Helpers.OutConnector;
 import Nodes.Node;
 import Nodes.StartNode;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
 
+/*
+    This is a visual representation of a start node. It only has an in connector.
+ */
 public class StartPanel extends NodePanel{
 
     private final JLabel start_label;
     private JButton test_out;
     private StartNode node;
 
+    /*
+        This assembles the panel using a gridbag layout.
+     */
     public StartPanel(MainWindow window, Point start) {
         super(window);
         setLayout(new GridBagLayout());
@@ -48,6 +51,9 @@ public class StartPanel extends NodePanel{
         this.node = (StartNode) node;
     }
 
+    /*
+        This resizes the panel and the font, as well as updating the border size, to fit under the new zoom level.
+     */
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);

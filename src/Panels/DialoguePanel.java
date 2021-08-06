@@ -10,8 +10,15 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
+/*
+    This is a visual representation of a dialogue node. A character can be assigned so that it's properties can be
+    used in conditionals.
+ */
 public class DialoguePanel extends NodePanel{
 
     private final JTextArea text_entry;
@@ -22,6 +29,9 @@ public class DialoguePanel extends NodePanel{
     private int person_id = -1;
     private boolean refreshing = false;
 
+    /*
+        This assembles the panel using a gridbag layout.
+     */
     //TODO: Find a way so that the connectors are the same size as they are visually.
     public DialoguePanel(MainWindow window, Point start) {
         super(window);
@@ -89,6 +99,10 @@ public class DialoguePanel extends NodePanel{
         refresh();
     }
 
+    /*
+        This reloads the current list of people from the project and adds the to the combo box. Updating the current
+        person if necessary, e.g. if it has been removed.
+     */
     @Override
     public void refresh() {
         refreshing = true;
@@ -108,6 +122,10 @@ public class DialoguePanel extends NodePanel{
         refreshing = false;
     }
 
+    /*
+        This resizes the font and the panel to fit under the new zoom level.
+        //TODO: add border resizing.
+     */
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);

@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/*
+    This is a visual representation of a choice node. Conceptually it is no different from the dialogue node, however
+    visually it does not have an out connector. Instead, it can store multiple answer nodes inside.
+ */
 public class ChoicePanel extends NodePanel {
     private List<AnswerPanel> answers;
     private final ChoicePanel self;
@@ -34,6 +37,9 @@ public class ChoicePanel extends NodePanel {
     private int person_id = -1;
     private boolean refreshing = false;
 
+    /*
+        This assembles the panel.
+     */
     public ChoicePanel(MainWindow window, Graph graph, Point start) {
         super(window, graph);
         setLayout(new GridBagLayout());
@@ -94,12 +100,17 @@ public class ChoicePanel extends NodePanel {
         rescale(1, new Point(0, 0));
     }
 
+
     @Override
     public void setNode(Node node) {
         this.node = (DialogueNode) node;
         refresh();
     }
 
+    /*
+        This reloads the current list of people from the project and adds the to the combo box. Updating the current
+        person if necessary, e.g. if it has been removed.
+     */
     @Override
     public void refresh() {
         refreshing = true;
@@ -119,6 +130,9 @@ public class ChoicePanel extends NodePanel {
         refreshing = false;
     }
 
+    /*
+        This adds a new answer panel visually and connects this to a new dialogue node conceptually.
+     */
     public NodePanel createAnswer() {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 1;
@@ -135,6 +149,10 @@ public class ChoicePanel extends NodePanel {
         return answer_panel;
     }
 
+    /*
+        This rescales the font as well as the panel to fit in all the answer panels under the new zoom level.
+        //TODO: add border resizing.
+     */
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);

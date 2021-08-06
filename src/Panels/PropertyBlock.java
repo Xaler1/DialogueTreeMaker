@@ -11,6 +11,10 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 
+/*
+    This is a visual representation of a property of a person. It allows the setting of the type of the property, its
+    name and value.
+ */
 public class PropertyBlock extends JPanel {
 
     protected final PropertyBlock self;
@@ -24,6 +28,9 @@ public class PropertyBlock extends JPanel {
     private JComboBox<String> type_selector;
     private JComboBox<Boolean> bool_selector;
 
+    /*
+        This assembles the panel using a gridbag layout.
+     */
     public PropertyBlock(Property property, Person person, CharacterEditWindow parent) {
         this.self = this;
         this.parent = parent;
@@ -123,6 +130,10 @@ public class PropertyBlock extends JPanel {
         }
     }
 
+    /*
+        Checks whether the name entered is valid. If it is then update the name, if not then revert to the previous name.
+        //TODO: investigate postActionEvent();
+     */
     private void checkName() {
         String new_name = name_field.getText().replace(" ", "");
         if (new_name.length() == 0) {
@@ -131,10 +142,12 @@ public class PropertyBlock extends JPanel {
         current_name = new_name;
         name_field.setText(current_name);
         property.name = current_name;
-        name_field.revalidate();
-        name_field.repaint();
     }
 
+    /*
+        This checks whether the value being entered is valid under the current property type. If it is then update the
+        value. If it is not then return to the previous value.
+     */
     //TODO: figure out why the last typed character is shown even though it is replaced
     private void checkValue() {
         String new_value = value_field.getText();
@@ -165,6 +178,9 @@ public class PropertyBlock extends JPanel {
         value_field.repaint();
     }
 
+    /*
+        This sets up the default value of the property according to which property type has been chosen.
+     */
     private void setDefault(int type) {
         switch (type) {
             case 0:

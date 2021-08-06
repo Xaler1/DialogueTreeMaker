@@ -5,6 +5,7 @@ import Nodes.*;
 import java.awt.*;
 import java.util.HashMap;
 
+
 public class Graph{
 
     public String name;

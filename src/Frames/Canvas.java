@@ -1,18 +1,19 @@
 package Frames;
 
-import Helpers.*;
+import Helpers.OutConnector;
 import Managers.Graph;
 import Panels.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.nio.channels.Pipe;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 //TODO: clean up this mess - make all the panel creation functions more or less the same order.
@@ -211,6 +212,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     /*
         Removes all the out connections of the given node on the graph.
         All of the visual connections are removed inside the panel itself, which is what calls this.
+        //TODO: maybe it makes more sense if this is inside the graph or even the treekeeper?
      */
     public void removeOutConnections(NodePanel panel) {
         graph.getNode(panel).removeChildren();

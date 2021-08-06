@@ -11,6 +11,10 @@ import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+/*
+    A visual representation of a person. For simplicity only shows the name and then gives a button to open the
+    person editing window. Also has a delete button for removing a person from the project.
+ */
 public class PersonBlock extends JPanel implements PropertyChangeListener {
 
     private final TreeKeeper keeper;
@@ -20,6 +24,9 @@ public class PersonBlock extends JPanel implements PropertyChangeListener {
     public final PersonBlock self;
     public final int id;
 
+    /*
+        This assembles the panel using a gridbag layout.
+     */
     public PersonBlock(int id, TreeKeeper keeper, PersonPanel parent) {
         this.keeper = keeper;
         this.self = this;
@@ -73,6 +80,10 @@ public class PersonBlock extends JPanel implements PropertyChangeListener {
         add(button, constraints);
     }
 
+    /*
+        Detects a property change when a person has been renamed.
+        //TODO: lol this is dumb, doesn't even check which person's name has been changed.
+     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("name_change")) {

@@ -4,6 +4,9 @@ import Frames.MainWindow;
 
 import java.util.Collection;
 
+/*
+    This is a manager class that is responsible for modifying the project - e.g. adding people and variables.
+ */
 public class TreeKeeper {
 
     private Project project;
