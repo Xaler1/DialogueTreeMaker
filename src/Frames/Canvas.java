@@ -78,11 +78,11 @@ public class Canvas extends JPanel implements PropertyChangeListener {
                         double old = scale.getX();
                         scale.setLocation(Math.min(Math.max(0.3, scale.getX() + mod), 3), Math.min(Math.max(0.3, scale.getY() + mod), 3));
                         float diff = (float) (scale.getX() / old);
+                        translateStart(diff, getMousePosition());
+                        updateLines();
                         for (NodePanel panel : components) {
                             panel.rescale(diff, getMousePosition());
                         }
-                        translateStart(diff, getMousePosition());
-                        updateLines();
                         return null;
                     }
                 };
