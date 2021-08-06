@@ -140,10 +140,7 @@ public class ChoicePanel extends NodePanel {
         super.rescale(mod, source);
         this.setSize((int)(300 * canvas.scale.getX()), (int)((150 + 50 * answers.size()) * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
-        //person_choice.setBounds((int)(40 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
-        //pane.setBounds((int)(40 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(100 * canvas.scale.getY()));
-        //in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()));
         in_connector.rescale();
         Image img = null;
         try {
@@ -152,7 +149,6 @@ public class ChoicePanel extends NodePanel {
             ex.printStackTrace();
         }
         Image scaled = img.getScaledInstance((int)(30 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()), Image.SCALE_FAST);
-        //add_btn.setBounds((int)(255 * canvas.scale.getX()), (int)(45 * canvas.scale.getY()), (int)(30 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()));
         add_btn.setIcon(new ImageIcon(scaled));
     }
 }

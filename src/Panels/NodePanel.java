@@ -22,7 +22,6 @@ public abstract class NodePanel extends JPanel {
     protected final TreeKeeper keeper;
 
     public NodePanel(MainWindow window) {
-        setLayout(null);
         this.window = window;
         this.keeper = window.keeper;
         canvas = window.current_canvas;
@@ -30,7 +29,6 @@ public abstract class NodePanel extends JPanel {
     }
 
     public NodePanel(MainWindow window, NodePanel parent) {
-        setLayout(null);
         this.parent = parent;
         this.window = window;
         this.keeper = window.keeper;
@@ -39,7 +37,6 @@ public abstract class NodePanel extends JPanel {
     }
 
     public NodePanel(MainWindow window, Graph graph) {
-        setLayout(null);
         this.window = window;
         this.graph = graph;
         this.keeper = window.keeper;
@@ -48,7 +45,6 @@ public abstract class NodePanel extends JPanel {
     }
 
     public NodePanel(MainWindow window, NodePanel parent, Graph graph) {
-        setLayout(null);
         this.window = window;
         this.parent = parent;
         this.graph = graph;

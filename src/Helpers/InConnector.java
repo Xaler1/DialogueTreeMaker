@@ -37,13 +37,11 @@ public class InConnector extends JLabel {
 
     /*
         This reloads the image and scales it appropriately for the current zoom level.
-        //TODO: instead of reloading the image - load it once in the constructor and then resize a copy here.
      */
     public void rescale() {
         Image scaled = source_img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaled);
         setIcon(icon);
-        //setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
     /*
@@ -54,6 +52,9 @@ public class InConnector extends JLabel {
         return parent;
     }
 
+    /*
+        This returns the center point of the in connector. Used for getting the point to which to draw a connection line.
+     */
     public Point getCenter() {
         Point point = parent.getLocation();
         point.translate(getX(), getY());

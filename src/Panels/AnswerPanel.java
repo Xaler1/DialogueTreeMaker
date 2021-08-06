@@ -49,10 +49,7 @@ public class AnswerPanel extends NodePanel{
 
     @Override
     public void rescale(float mod, Point source) {
-        //setSize((int)(280 * canvas.scale.getX()), (int)(50 * canvas.scale.getY()));
-        //pane.setBounds((int)(35 * canvas.scale.getX()), (int)(5 * canvas.scale.getY()), (int)(210 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()));
         text_entry.setFont(window.main_font.deriveFont((float) (18 * canvas.scale.getX())));
-        //out_connector.setLocation((int)(250 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()));
         out_connector.rescale();
     }
 }

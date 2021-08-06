@@ -54,8 +54,6 @@ public class EndPanel extends NodePanel{
         super.rescale(mod, source);
         setSize((int)(120 * canvas.scale.getX()), (int)(50 * canvas.scale.getY()));
         end_label.setFont(window.main_font.deriveFont((float) (28.0f * canvas.scale.getX())));
-        //end_label.setBounds((int)(40 * canvas.scale.getX()), (int)(5 * canvas.scale.getY()), (int)(70 * canvas.scale.getX()), (int)(40 * canvas.scale.getY()));
-        //in_connector.setLocation((int)(5 * canvas.scale.getX()), (int)(10 * canvas.scale.getY()));
         in_connector.rescale();
     }
 }

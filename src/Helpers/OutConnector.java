@@ -9,12 +9,18 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
+/*
+    This represents the out connector for a particular panel on the canvas.
+ */
 public class OutConnector extends JLabel {
     private final NodePanel parent;
     private final MainWindow window;
     public InConnector destination;
     private Image source_img;
 
+    /*
+        This loads the default out connector image.
+     */
     public OutConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
@@ -26,11 +32,17 @@ public class OutConnector extends JLabel {
         addMouseListener(new OutListener(window, this));
     }
 
+    /*
+        This overrides the default get parent function to instead return the parent NodePanel class.
+     */
     @Override
     public NodePanel getParent() {
         return parent;
     }
 
+    /*
+        This returns the center point of the connector. Used for getting the point from which to draw a connection line.
+     */
     public Point getCenter() {
         Point point = parent.getLocation();
         point.translate(getX(), getY());
@@ -38,25 +50,27 @@ public class OutConnector extends JLabel {
         return point;
     }
 
+    /*
+        This rescales the image when zooming.
+     */
     public void rescale() {
         Image scaled = source_img.getScaledInstance((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()), Image.SCALE_SMOOTH);
         ImageIcon icon = new ImageIcon(scaled);
         setIcon(icon);
-        //setSize((int)(30 * window.current_canvas.scale.getX()), (int)(30 * window.current_canvas.scale.getY()));
     }
 
+    /*
+        The sets the end point of an outgoing connection. Mostly used to make it easier to draw a connection line.
+     */
     public void setDestination(InConnector connector) {
         destination = connector;
     }
 
+    /*
+        Removes the connection on the canvas and asks the parent to remove it on the graph as well.
+     */
     public void removeConnection() {
         destination = null;
         parent.removeAllOutConnections();
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        //g.drawImage()
     }
 }
