@@ -1,9 +1,9 @@
 package Frames;
 
-import Managers.TreeKeeper;
-import Panels.NodePanel;
 import Helpers.OutConnector;
 import Managers.Graph;
+import Managers.TreeKeeper;
+import Panels.NodePanel;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -41,7 +41,7 @@ public class MainWindow extends JFrame implements MouseListener {
     private final List<Canvas> canvases;
     public Canvas current_canvas = null;
     private PersonPanel character_panel;
-    private Variables variables_panel;
+    private VariablePanel variables_panel;
     MainWindow self;
     private Point2D scale;
 
@@ -215,7 +215,7 @@ public class MainWindow extends JFrame implements MouseListener {
         add(tabs, constraints);
         character_panel = new PersonPanel(keeper);
         character_panel.setPreferredSize(new Dimension(100, 300));
-        variables_panel = new Variables();
+        variables_panel = new VariablePanel(keeper);
         variables_panel.setPreferredSize(new Dimension(100, 300));
         constraints.gridx = 1;
         constraints.gridheight = 1;

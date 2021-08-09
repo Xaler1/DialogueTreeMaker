@@ -11,10 +11,12 @@ import java.util.Map;
 public class Project {
     public List<Graph> graphs;
     public Map<Integer, Person> people;
+    public Map<Integer, Variable> variables;
     public String name;
 
     public Project(String name) {
         graphs = new ArrayList<>();
         people = new HashMap<>();
+        variables = new HashMap<>();
     }
 }

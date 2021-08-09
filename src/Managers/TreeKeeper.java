@@ -10,7 +10,8 @@ import java.util.Collection;
 public class TreeKeeper {
 
     private Project project;
-    private int latest_id = 0;
+    private int latest_person_id = 0;
+    private int latest_variable_id = 0;
 
     public TreeKeeper() {
         project = new Project("Untitled project");
@@ -23,9 +24,9 @@ public class TreeKeeper {
                 return -1;
             }
         }
-        project.people.put(latest_id, new Person(latest_id, name));
-        latest_id++;
-        return latest_id - 1;
+        project.people.put(latest_person_id, new Person(latest_person_id, name));
+        latest_person_id++;
+        return latest_person_id - 1;
     }
 
     public void removeCharacter(int id) {
@@ -57,5 +58,26 @@ public class TreeKeeper {
 
     public Collection<Person> getPeople() {
         return project.people.values();
+    }
+
+    public Variable addVariable(String name) {
+        if (!isVariableNameValid(name)) return null;
+        Variable new_variable = new Variable(name, latest_variable_id);
+        project.variables.put(latest_variable_id, new_variable);
+        latest_variable_id++;
+        return new_variable;
+    }
+
+    public boolean isVariableNameValid(String name) {
+        for (Variable variable : project.variables.values()) {
+            if (variable.name.equals(name)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void removeVariable(int id) {
+        project.variables.remove(id);
     }
 }

@@ -7,9 +7,11 @@ public class Variable {
     public Class type = String.class;
     public String name = "";
     public String default_value = "";
+    public final int id;
 
-    public Variable(String name) {
+    public Variable(String name, int id) {
         this.name = name;
+        this.id = id;
     }
 
     public void setType(String type) {
