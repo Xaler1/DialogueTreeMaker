@@ -7,8 +7,6 @@ import Panels.PropertyBlock;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -28,7 +26,6 @@ public class CharacterEditWindow extends JDialog {
 
     private JLabel image;
     private JTextField name_entry;
-    private String current_name;
     private final GridBagConstraints constraints = new GridBagConstraints();
 
     /*
@@ -79,14 +76,12 @@ public class CharacterEditWindow extends JDialog {
         name_entry = new JTextField();
         name_entry.setFont(name_entry.getFont().deriveFont(24f));
         name_entry.setText(person.name);
-        name_entry.addKeyListener(new KeyAdapter() {
+        name_entry.addFocusListener(new FocusAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
+            public void focusLost(FocusEvent e) {
                 checkName();
             }
         });
-        current_name = person.name;
         add(name_entry, constraints);
 
         constraints.gridy = 2;
@@ -195,15 +190,20 @@ public class CharacterEditWindow extends JDialog {
     }
 
     /*
-        This checks that the name being entered is valid (i.e. not empty) and either reverts to the previous name or
-        accepts the new one.
+        This checks that he name entered is valid i.e. - that it is not empty and not a duplicate. If it is valid
+        then the person's name is updated. Otherwise, the name entered is reverted.
      */
     private void checkName() {
-        String new_name = name_entry.getText();
-        if (new_name.length() != 0) {
-            current_name = new_name;
+        String new_name = name_entry.getText().strip();
+        if (new_name.equals(person.name)) return;
+        if (new_name.length() == 0) {
+            JOptionPane.showMessageDialog(this, "The name cannot be empty", "Invalid name", JOptionPane.ERROR_MESSAGE);
+            name_entry.setText(person.name);
+        } else if (!keeper.isPersonNameValid(new_name)) {
+            JOptionPane.showMessageDialog(this, "People cannot have duplicate names", "Invalid name", JOptionPane.ERROR_MESSAGE);
+            name_entry.setText(person.name);
+        } else {
+            person.setName(new_name);
         }
-        person.setName(current_name);
-        name_entry.setText(current_name);
     }
 }

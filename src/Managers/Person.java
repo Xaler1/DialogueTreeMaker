@@ -63,4 +63,11 @@ public class Person {
         this.name = name;
         notifier.firePropertyChange("name_change", "old", name);
     }
+
+    public boolean isPropertyNameValid(String name) {
+        for (Property property : properties.values()) {
+            if (property.name.equals(name)) return false;
+        }
+        return true;
+    }
 }

@@ -12,18 +12,15 @@ import java.io.IOException;
 
 public class VariableBlock extends JPanel {
     private final Variable variable;
-    private final TreeKeeper keeper;
     private final VariableBlock self;
     private String last_name;
-    private String last_value;
 
-    private JTextField value_entry;
-    private JTextField name_entry;
-    private JComboBox<String> bool_chooser;
+    private final JTextField value_entry;
+    private final JTextField name_entry;
+    private final JComboBox<String> bool_chooser;
 
     public VariableBlock(Variable variable, TreeKeeper keeper) {
         this.variable = variable;
-        this.keeper = keeper;
         this.self = this;
         last_name = variable.name;
 
@@ -131,7 +128,7 @@ public class VariableBlock extends JPanel {
         Image img = null;
         try {
             img = ImageIO.read(new File("imgs/remove.png"));
-        } catch (IOException ex) {}
+        } catch (IOException ignored) {}
         Image resized = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
         Icon icon = new ImageIcon(resized);
         JLabel remove_btn = new JLabel(icon);
@@ -179,7 +176,7 @@ public class VariableBlock extends JPanel {
         int loc = name_entry.getCaretPosition();
         String new_name = name_entry.getText();
         new_name = new_name.substring(0, loc) + e.getKeyChar() + new_name.substring(loc);
-        if (!new_name.matches("^[[a-zA-Z]+_+]+[[a-zA-Z]*_*\\-*[a-zA-Z]*[0-9]*]*$")) {
+        if (!new_name.matches("^[[a-zA-Z]+_+]+[[a-zA-Z]*_*[a-zA-Z]*[0-9]*]*$")) {
             name_entry.setEditable(false);
         } else {
             name_entry.setEditable(true);

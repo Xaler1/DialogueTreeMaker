@@ -80,10 +80,6 @@ public class PersonBlock extends JPanel implements PropertyChangeListener {
         add(button, constraints);
     }
 
-    /*
-        Detects a property change when a person has been renamed.
-        //TODO: lol this is dumb, doesn't even check which person's name has been changed.
-     */
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals("name_change")) {

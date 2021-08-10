@@ -20,11 +20,10 @@ public class PropertyBlock extends JPanel {
     protected final PropertyBlock self;
     private final CharacterEditWindow parent;
     private final Property property;
+    private final Person person;
 
-    private JTextField name_field;
-    private String current_name;
-    private JTextField value_field;
-    private String current_value;
+    private JTextField name_entry;
+    private JTextField value_entry;
     private JComboBox<String> type_selector;
     private JComboBox<Boolean> bool_selector;
 
@@ -35,6 +34,7 @@ public class PropertyBlock extends JPanel {
         this.self = this;
         this.parent = parent;
         this.property = property;
+        this.person = person;
         setBackground(Color.WHITE);
         setLayout(new GridBagLayout());
         setBorder(BorderFactory.createBevelBorder(1));
@@ -63,35 +63,31 @@ public class PropertyBlock extends JPanel {
 
         constraints.gridx = 1;
         constraints.weightx = 0.2;
-        name_field = new JTextField();
-        name_field.setPreferredSize(new Dimension(120, 30));
-        name_field.setFont(name_field.getFont().deriveFont(14f));
-        name_field.addKeyListener(new KeyAdapter() {
+        name_entry = new JTextField();
+        name_entry.setPreferredSize(new Dimension(120, 30));
+        name_entry.setFont(name_entry.getFont().deriveFont(14f));
+        name_entry.addFocusListener(new FocusAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
+            public void focusLost(FocusEvent e) {
                 checkName();
             }
         });
-        add(name_field, constraints);
-        name_field.setText(property.name);
-        current_name = property.name;
+        add(name_entry, constraints);
+        name_entry.setText(property.name);
 
         constraints.gridx = 2;
         constraints.weightx = 0.6;
-        value_field = new JTextField();
-        value_field.setFont(value_field.getFont().deriveFont(14f));
-        value_field.setPreferredSize(new Dimension(170, 30));
-        value_field.addKeyListener(new KeyAdapter() {
+        value_entry = new JTextField();
+        value_entry.setFont(value_entry.getFont().deriveFont(14f));
+        value_entry.setPreferredSize(new Dimension(170, 30));
+        value_entry.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
-                checkValue();
+            public void keyPressed(KeyEvent e) {
+                checkValue(e);
             }
         });
-        add(value_field, constraints);
-        value_field.setText(property.value);
-        current_value = property.value;
+        add(value_entry, constraints);
+        value_entry.setText(property.value);
 
         bool_selector = new JComboBox<>();
         bool_selector.addItem(true);
@@ -124,7 +120,7 @@ public class PropertyBlock extends JPanel {
         add(remove_btn, constraints);
 
         if (property.type.equals("bool")) {
-            value_field.setVisible(false);
+            value_entry.setVisible(false);
             bool_selector.setVisible(true);
             bool_selector.setSelectedItem(Boolean.valueOf(property.value));
         }
@@ -132,50 +128,55 @@ public class PropertyBlock extends JPanel {
 
     /*
         Checks whether the name entered is valid. If it is then update the name, if not then revert to the previous name.
-        //TODO: investigate postActionEvent();
      */
     private void checkName() {
-        String new_name = name_field.getText().replace(" ", "");
+        String new_name = name_entry.getText().trim();
         if (new_name.length() == 0) {
-            new_name = current_name;
+            JOptionPane.showMessageDialog(this, "A property cannot have an empty name", "Invalid name", JOptionPane.ERROR_MESSAGE);
+            name_entry.setText(property.name);
+        } else if (!person.isPropertyNameValid(new_name)) {
+            JOptionPane.showMessageDialog(this, "Properties cannot have duplicate names", "Invalid name", JOptionPane.ERROR_MESSAGE);
+            name_entry.setText(property.name);
+        } else {
+            property.name = new_name;
         }
-        current_name = new_name;
-        name_field.setText(current_name);
-        property.name = current_name;
     }
 
     /*
         This checks whether the value being entered is valid under the current property type. If it is then update the
-        value. If it is not then return to the previous value.
+        value. If it is not then set the value entry to not be editable so that the last pressed key does not register.
      */
-    //TODO: figure out why the last typed character is shown even though it is replaced
-    private void checkValue() {
-        String new_value = value_field.getText();
+    private void checkValue(KeyEvent e) {
+        if (e.isActionKey() || e.getKeyCode() == 8) {
+            value_entry.setEditable(true);
+            return;
+        }
+        int loc = value_entry.getCaretPosition();
+        String new_value = value_entry.getText();
+        new_value = new_value.substring(0, loc) + e.getKeyChar() + new_value.substring(loc);
         switch (type_selector.getSelectedIndex()) {
             case 0:
-                current_value = new_value;
+                value_entry.setEditable(true);
                 break;
             case 1:
                 try {
                     Integer.valueOf(new_value);
                 } catch (NumberFormatException ex) {
+                    value_entry.setEditable(false);
                     break;
                 }
-                current_value = new_value;
+                value_entry.setEditable(true);
                 break;
             case 2:
                 try {
                     Float.valueOf(new_value);
                 } catch (NumberFormatException ex) {
+                    value_entry.setEditable(false);
                     break;
                 }
-                current_value = new_value;
+                value_entry.setEditable(true);
                 break;
         }
-        value_field.setText(current_value);
-        property.value = current_value;
-        value_field.revalidate();
-        value_field.repaint();
     }
 
     /*
@@ -184,28 +185,28 @@ public class PropertyBlock extends JPanel {
     private void setDefault(int type) {
         switch (type) {
             case 0:
-                value_field.setText("");
+                value_entry.setText("");
                 property.value = "";
                 bool_selector.setVisible(false);
-                value_field.setVisible(true);
+                value_entry.setVisible(true);
                 break;
             case 1:
-                value_field.setText("0");
+                value_entry.setText("0");
                 property.value = "0";
                 bool_selector.setVisible(false);
-                value_field.setVisible(true);
+                value_entry.setVisible(true);
                 break;
             case 2:
-                value_field.setText("0.0");
+                value_entry.setText("0.0");
                 property.value = "0.0";
                 bool_selector.setVisible(false);
-                value_field.setVisible(true);
+                value_entry.setVisible(true);
                 break;
             case 3:
                 property.value = "true";
                 bool_selector.setSelectedItem(true);
                 bool_selector.setVisible(true);
-                value_field.setVisible(false);
+                value_entry.setVisible(false);
         }
     }
 }

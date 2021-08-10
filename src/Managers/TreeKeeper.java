@@ -29,6 +29,13 @@ public class TreeKeeper {
         return latest_person_id - 1;
     }
 
+    public boolean isPersonNameValid(String name) {
+        for (Person person : project.people.values()) {
+            if (person.name.equals(name)) return false;
+        }
+        return true;
+    }
+
     public void removeCharacter(int id) {
         project.people.remove(id);
     }
