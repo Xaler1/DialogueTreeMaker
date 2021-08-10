@@ -1,9 +1,10 @@
 package Nodes;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Node {
+public class Node implements Serializable {
     private int id;
     private List<Node> children = new ArrayList<>();
 

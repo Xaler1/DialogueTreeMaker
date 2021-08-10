@@ -2,12 +2,11 @@ package Helpers;
 
 import Frames.MainWindow;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
-public class OutListener extends MouseAdapter {
+public class OutListener extends MouseAdapter implements Serializable {
     private final MainWindow window;
     private final OutConnector component;
 

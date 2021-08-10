@@ -3,10 +3,11 @@ package Managers;
 import Nodes.*;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.HashMap;
 
 
-public class Graph{
+public class Graph implements Serializable {
 
     public String name;
     private HashMap<Component, Integer> componentKeys = new HashMap<Component, Integer>();

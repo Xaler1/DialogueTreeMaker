@@ -5,11 +5,12 @@ import Frames.MainWindow;
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /*
     This detects when a user presses on a panel on a canvas and starts the relocation loop for that panel in the main window.
  */
-public class ComponentListener extends MouseAdapter {
+public class ComponentListener extends MouseAdapter implements Serializable {
     private final MainWindow window;
     private final JPanel panel;
 

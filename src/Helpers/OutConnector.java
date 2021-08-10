@@ -8,11 +8,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 
 /*
     This represents the out connector for a particular panel on the canvas.
  */
-public class OutConnector extends JLabel {
+public class OutConnector extends JLabel implements Serializable {
     private final NodePanel parent;
     private final MainWindow window;
     public InConnector destination;

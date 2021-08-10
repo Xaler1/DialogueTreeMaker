@@ -8,6 +8,8 @@ import Panels.NodePanel;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
@@ -23,7 +25,7 @@ import java.util.List;
  */
 public class MainWindow extends JFrame implements MouseListener {
 
-    private List<Graph> graphs;
+    private final List<Graph> graphs;
     public final TreeKeeper keeper;
 
     private boolean mouse_down = false;
@@ -31,8 +33,6 @@ public class MainWindow extends JFrame implements MouseListener {
     private JMenuBar menu_bar = new JMenuBar();
     private JMenu menu, submenu;
     private JMenuItem menu_item;
-
-    private JButton button;
 
     private JPopupMenu right_click_menu;
 
@@ -48,7 +48,6 @@ public class MainWindow extends JFrame implements MouseListener {
     public final Font main_font = new Font("Serif", Font.PLAIN, 28);
 
     public NodePanel potential_end_component = null;
-    public String last_character = "";
 
     public boolean show_grid = true;
 
@@ -57,7 +56,8 @@ public class MainWindow extends JFrame implements MouseListener {
      */
     public MainWindow(List<Graph> graphs, String name, TreeKeeper keeper) {
         try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -73,36 +73,16 @@ public class MainWindow extends JFrame implements MouseListener {
         //This right click menu.
         right_click_menu = new JPopupMenu();
         JMenuItem item = new JMenuItem("Start node");
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                current_canvas.addStartNode();
-            }
-        });
+        item.addActionListener(e -> current_canvas.addStartNode());
         right_click_menu.add(item);
         item = new JMenuItem("Dialogue node");
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                current_canvas.addDialogueNode();
-            }
-        });
+        item.addActionListener(e -> current_canvas.addDialogueNode());
         right_click_menu.add(item);
         item = new JMenuItem("Choice node");
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                current_canvas.addChoiceNode();
-            }
-        });
+        item.addActionListener(e -> current_canvas.addChoiceNode());
         right_click_menu.add(item);
         item = new JMenuItem("End node");
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                current_canvas.addEndNode();
-            }
-        });
+        item.addActionListener(e -> current_canvas.addEndNode());
         right_click_menu.add(item);
 
         tabs.addChangeListener(new ChangeListener() {
@@ -132,6 +112,7 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_item = new JMenuItem("Open");
         menu.add(menu_item);
         menu_item = new JMenuItem("Save");
+        menu_item.addActionListener(e -> saveObject());
         menu.add(menu_item);
         submenu = new JMenu("Export as");
         menu.add(submenu);
@@ -226,7 +207,7 @@ public class MainWindow extends JFrame implements MouseListener {
         add(variables_panel, constraints);
 
         setBackground(Color.GRAY);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(screen_size.width, screen_size.height);
         setVisible(true);
         setTitle(name);
@@ -245,9 +226,19 @@ public class MainWindow extends JFrame implements MouseListener {
         });
     }
 
-    //What ever Zinks2 is doing.
+    //Whatever Zinks2 is doing.
     public void saveAsJson() {
         System.out.println("RAN!");
+    }
+
+    private void saveObject() {
+        final JFileChooser chooser = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("Dialogue trees", "tree");
+        chooser.setFileFilter(filter);
+        int result = chooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            keeper.saveProject(chooser.getSelectedFile());
+        }
     }
 
     /*
@@ -385,6 +376,7 @@ public class MainWindow extends JFrame implements MouseListener {
         canvases.add(new_canvas);
         setDefaultLookAndFeelDecorated(true);
         tabs.add(name, new_canvas);
+        tabs.setSelectedIndex(tabs.getTabCount() - 1);
     }
 
     @Override

@@ -41,12 +41,9 @@ public class VariableBlock extends JPanel {
         type_selector.addItem("bool");
         type_selector.setSelectedItem(variable.type.getSimpleName().toLowerCase().replace("eger", "").replace("ean", ""));
         type_selector.setPreferredSize(new Dimension(70, 30));
-        type_selector.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                variable.setType((String) e.getItem());
-                setDefaultValue();
-            }
+        type_selector.addItemListener(e -> {
+            variable.setType((String) e.getItem());
+            setDefaultValue();
         });
         add(type_selector, constraints);
 

@@ -2,6 +2,8 @@ package Managers;
 
 import Frames.MainWindow;
 
+import javax.swing.*;
+import java.io.*;
 import java.util.Collection;
 
 /*
@@ -13,9 +15,47 @@ public class TreeKeeper {
     private int latest_person_id = 0;
     private int latest_variable_id = 0;
 
+    private MainWindow window;
+
     public TreeKeeper() {
         project = new Project("Untitled project");
-        MainWindow window = new MainWindow(project.graphs, "Untitled project", this);
+        window = new MainWindow(project.graphs, "Untitled project", this);
+    }
+
+    public void saveProject(File destination) {
+        if (!destination.getName().matches(".+(.tree)$")) {
+            destination = new File(destination + ".tree");
+        }
+        try {
+            destination.createNewFile();
+            ObjectOutputStream object_writer = new ObjectOutputStream(new FileOutputStream(destination));
+            object_writer.writeObject(project);
+            object_writer.close();
+            project.name = destination.getName().replace(".tree", "");
+            window.setName(project.name);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getClass().getSimpleName(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Error writing to file: " + ex.getClass().getSimpleName(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    public void loadProject(File source) {
+        try {
+            String name = source.getName().replace(".tree", "");
+            ObjectInputStream object_reader = new ObjectInputStream(new FileInputStream(source));
+            project = (Project) object_reader.readObject();
+            window.dispose();
+            window = new MainWindow(project.graphs, name, this);
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (ClassNotFoundException ex) {
+            JOptionPane.showMessageDialog(window, "Error reading from file", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(window, "Error reading from file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public int addCharacter(String name) {

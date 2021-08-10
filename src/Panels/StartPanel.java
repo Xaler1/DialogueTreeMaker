@@ -12,7 +12,7 @@ import java.awt.*;
 /*
     This is a visual representation of a start node. It only has an in connector.
  */
-public class StartPanel extends NodePanel{
+public class StartPanel extends NodePanel {
 
     private final JLabel start_label;
     private JButton test_out;

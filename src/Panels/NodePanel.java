@@ -10,13 +10,14 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.Serializable;
 
 /*
     This is the parent class of all the node panels. It handles the movement of the panels during zoom. (Since zooming
     doesn't really zoom, but just makes everything smaller - all the panels need to be spread out/grouped together to
     create the illusion of zoom)
  */
-public abstract class NodePanel extends JPanel {
+public abstract class NodePanel extends JPanel implements Serializable {
     protected OutConnector out_connector;
     protected InConnector in_connector;
     protected NodePanel parent = null;

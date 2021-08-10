@@ -18,21 +18,19 @@ import java.io.IOException;
 public class PropertyBlock extends JPanel {
 
     protected final PropertyBlock self;
-    private final CharacterEditWindow parent;
     private final Property property;
     private final Person person;
 
-    private JTextField name_entry;
-    private JTextField value_entry;
-    private JComboBox<String> type_selector;
-    private JComboBox<Boolean> bool_selector;
+    private final JTextField name_entry;
+    private final JTextField value_entry;
+    private final JComboBox<String> type_selector;
+    private final JComboBox<Boolean> bool_selector;
 
     /*
         This assembles the panel using a gridbag layout.
      */
     public PropertyBlock(Property property, Person person, CharacterEditWindow parent) {
         this.self = this;
-        this.parent = parent;
         this.property = property;
         this.person = person;
         setBackground(Color.WHITE);
@@ -52,12 +50,9 @@ public class PropertyBlock extends JPanel {
         type_selector.addItem("bool");
         type_selector.setSelectedItem(property.type);
         type_selector.setPreferredSize(new Dimension(80, 30));
-        type_selector.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                property.type = (String)type_selector.getSelectedItem();
-                setDefault(type_selector.getSelectedIndex());
-            }
+        type_selector.addItemListener(e -> {
+            property.type = (String)type_selector.getSelectedItem();
+            setDefault(type_selector.getSelectedIndex());
         });
         add(type_selector, constraints);
 
@@ -92,12 +87,7 @@ public class PropertyBlock extends JPanel {
         bool_selector = new JComboBox<>();
         bool_selector.addItem(true);
         bool_selector.addItem(false);
-        bool_selector.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                property.value = bool_selector.getSelectedItem().toString();
-            }
-        });
+        bool_selector.addItemListener(e -> property.value = bool_selector.getSelectedItem().toString());
         add(bool_selector, constraints);
 
         constraints.gridx = 3;
@@ -105,7 +95,7 @@ public class PropertyBlock extends JPanel {
         Image img = null;
         try {
             img = ImageIO.read(new File("imgs/remove.png"));
-        } catch (IOException ex) {}
+        } catch (IOException ignored) {}
         Image resized = img.getScaledInstance(20, 20, Image.SCALE_SMOOTH);
         Icon icon = new ImageIcon(resized);
         JLabel remove_btn = new JLabel(icon);
@@ -155,27 +145,25 @@ public class PropertyBlock extends JPanel {
         String new_value = value_entry.getText();
         new_value = new_value.substring(0, loc) + e.getKeyChar() + new_value.substring(loc);
         switch (type_selector.getSelectedIndex()) {
-            case 0:
-                value_entry.setEditable(true);
-                break;
-            case 1:
+            case 0 -> value_entry.setEditable(true);
+            case 1 -> {
                 try {
                     Integer.valueOf(new_value);
                 } catch (NumberFormatException ex) {
                     value_entry.setEditable(false);
-                    break;
+                    return;
                 }
                 value_entry.setEditable(true);
-                break;
-            case 2:
+            }
+            case 2 -> {
                 try {
                     Float.valueOf(new_value);
                 } catch (NumberFormatException ex) {
                     value_entry.setEditable(false);
-                    break;
+                    return;
                 }
                 value_entry.setEditable(true);
-                break;
+            }
         }
     }
 
@@ -184,29 +172,30 @@ public class PropertyBlock extends JPanel {
      */
     private void setDefault(int type) {
         switch (type) {
-            case 0:
+            case 0 -> {
                 value_entry.setText("");
                 property.value = "";
                 bool_selector.setVisible(false);
                 value_entry.setVisible(true);
-                break;
-            case 1:
+            }
+            case 1 -> {
                 value_entry.setText("0");
                 property.value = "0";
                 bool_selector.setVisible(false);
                 value_entry.setVisible(true);
-                break;
-            case 2:
+            }
+            case 2 -> {
                 value_entry.setText("0.0");
                 property.value = "0.0";
                 bool_selector.setVisible(false);
                 value_entry.setVisible(true);
-                break;
-            case 3:
+            }
+            case 3 -> {
                 property.value = "true";
                 bool_selector.setSelectedItem(true);
                 bool_selector.setVisible(true);
                 value_entry.setVisible(false);
+            }
         }
     }
 }

@@ -14,7 +14,7 @@ import java.awt.*;
     to another node. Conceptually it is the same as a dialogue node, however visually it is stored directly inside a choice
     to which it is connected directly.
  */
-public class AnswerPanel extends NodePanel{
+public class AnswerPanel extends NodePanel {
 
     private final JTextArea text_entry;
     private final JScrollPane pane;

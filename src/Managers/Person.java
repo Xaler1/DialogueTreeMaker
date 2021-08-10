@@ -5,13 +5,14 @@ import Helpers.Property;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /*
     This represents a person in the project. Storing the name, id, as well as an image and a list of properties.
  */
-public class Person {
+public class Person implements Serializable {
 
     public final int id;
     private int property_id = 0;

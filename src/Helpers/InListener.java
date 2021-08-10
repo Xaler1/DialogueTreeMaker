@@ -2,16 +2,15 @@ package Helpers;
 
 import Frames.MainWindow;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.Serializable;
 
 /*
     This handles mouse operations on in connectors - setting it as a potential end point for a link being created,
     deleting all the connections.
  */
-public class InListener extends MouseAdapter {
+public class InListener extends MouseAdapter implements Serializable {
     private final MainWindow window;
     private final InConnector component;
 

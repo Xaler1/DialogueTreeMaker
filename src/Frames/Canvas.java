@@ -12,6 +12,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ import java.util.List;
     This class holds and draws the main representation of a dialogue graph. It is responsible for creating and managing
     the visual representations of the nodes of the graph.
  */
-public class Canvas extends JPanel implements PropertyChangeListener {
+public class Canvas extends JPanel implements PropertyChangeListener, Serializable {
 
     public final Graph graph;
     public boolean has_start_node = false;
@@ -29,7 +30,6 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     private GridBagConstraints constraints;
     private Font main_font;
     private final MainWindow window;
-    private Graphics2D painter;
     public int num_workers = 5;
 
     public Line2D temp_line = null;
@@ -266,7 +266,7 @@ public class Canvas extends JPanel implements PropertyChangeListener {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        painter = (Graphics2D) g;
+        Graphics2D painter = (Graphics2D) g;
         if (temp_line != null) {
             painter.draw(temp_line);
         }

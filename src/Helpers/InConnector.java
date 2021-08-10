@@ -8,12 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 /*
     This represents the in connector for a particular panel on the canvas.
  */
-public class InConnector extends JLabel {
+public class InConnector extends JLabel implements Serializable {
 
     private final NodePanel parent;
     private final MainWindow window;

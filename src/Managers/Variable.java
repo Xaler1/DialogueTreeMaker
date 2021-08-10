@@ -1,9 +1,11 @@
 package Managers;
 
+import java.io.Serializable;
+
 /*
     This class is for storing information about variables that can be used in conditional statements.
  */
-public class Variable {
+public class Variable implements Serializable {
     public Class type = String.class;
     public String name = "";
     public String default_value = "";
