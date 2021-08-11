@@ -38,7 +38,7 @@ public class MainWindow extends JFrame implements MouseListener {
 
     private JTabbedPane tabs = new JTabbedPane();
 
-    private final List<Canvas> canvases;
+    public final List<Canvas> canvases;
     public Canvas current_canvas = null;
     private PersonPanel character_panel;
     private VariablePanel variables_panel;
@@ -73,16 +73,16 @@ public class MainWindow extends JFrame implements MouseListener {
         //This right click menu.
         right_click_menu = new JPopupMenu();
         JMenuItem item = new JMenuItem("Start node");
-        item.addActionListener(e -> current_canvas.addStartNode());
+        item.addActionListener(e -> current_canvas.addStartNode(null));
         right_click_menu.add(item);
         item = new JMenuItem("Dialogue node");
-        item.addActionListener(e -> current_canvas.addDialogueNode());
+        item.addActionListener(e -> current_canvas.addDialogueNode(null));
         right_click_menu.add(item);
         item = new JMenuItem("Choice node");
-        item.addActionListener(e -> current_canvas.addChoiceNode());
+        item.addActionListener(e -> current_canvas.addChoiceNode(null));
         right_click_menu.add(item);
         item = new JMenuItem("End node");
-        item.addActionListener(e -> current_canvas.addEndNode());
+        item.addActionListener(e -> current_canvas.addEndNode(null));
         right_click_menu.add(item);
 
         tabs.addChangeListener(new ChangeListener() {
@@ -110,6 +110,7 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_item = new JMenuItem("New");
         menu.add(menu_item);
         menu_item = new JMenuItem("Open");
+        menu_item.addActionListener(e -> loadObject());
         menu.add(menu_item);
         menu_item = new JMenuItem("Save");
         menu_item.addActionListener(e -> saveObject());
@@ -133,7 +134,7 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_item.setAction(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createCanvas("");
+                createCanvas(null);
             }
         });
         menu_item.setText("Graph");
@@ -177,11 +178,6 @@ public class MainWindow extends JFrame implements MouseListener {
         });
         menu.add(slider);
 
-        canvases = new ArrayList<>();
-        for (Graph graph : graphs) {
-            createCanvas(graph.name);
-        }
-
         //This section assembles the main portion of the window.
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -206,8 +202,13 @@ public class MainWindow extends JFrame implements MouseListener {
         constraints.gridy = 1;
         add(variables_panel, constraints);
 
+        canvases = new ArrayList<>();
+        for (Graph graph : graphs) {
+            createCanvas(graph);
+        }
+
         setBackground(Color.GRAY);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(screen_size.width, screen_size.height);
         setVisible(true);
         setTitle(name);
@@ -238,6 +239,16 @@ public class MainWindow extends JFrame implements MouseListener {
         int result = chooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             keeper.saveProject(chooser.getSelectedFile());
+        }
+    }
+
+    private void loadObject() {
+        final JFileChooser chooser = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("Dialogue trees", "tree");
+        chooser.setFileFilter(filter);
+        int result = chooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            keeper.loadProject(chooser.getSelectedFile());
         }
     }
 
@@ -327,9 +338,10 @@ public class MainWindow extends JFrame implements MouseListener {
         This creates a new canvas - first asking the user for its name. Only non-empty, non-duplicate names with
         no spaces or dots are allowed.
      */
-    private void createCanvas(String name) {
-        if (name.equals("")) {
+    private void createCanvas(Graph graph) {
+        if (graph == null) {
             while (true) {
+                String name = "";
                 name = (String) JOptionPane.showInputDialog(
                         this,
                         "Enter the name of the graph.",
@@ -352,30 +364,31 @@ public class MainWindow extends JFrame implements MouseListener {
                     JOptionPane.showMessageDialog(this, "The name must be less than 30 characters", "Invalid name", JOptionPane.ERROR_MESSAGE);
                 } else {
                     boolean duplicate = false;
-                    for (Graph graph : graphs) {
-                        if (name.equals(graph.name)) {
+                    for (int x = 0; x < graphs.size(); x++) {
+                        if (name.equals(graphs.get(x).name)) {
                             JOptionPane.showMessageDialog(this, "There is already a graph with this name", "Invalid name", JOptionPane.ERROR_MESSAGE);
                             duplicate = true;
                             break;
                         }
                     }
                     if (duplicate) continue;
+                    graph = new Graph(name);
+                    graphs.add(graph);
                     break;
                 }
             }
         }
-        Graph new_graph = new Graph(name);
-        graphs.add(new_graph);
-        Canvas new_canvas = new Canvas(new_graph, self, scale);
+        Canvas new_canvas = new Canvas(graph, self, graph.zoom);
         character_panel.addListener(new_canvas);
         new_canvas.addMouseListener(self);
         new_canvas.setBackground(Color.WHITE);
         new_canvas.setComponentPopupMenu(right_click_menu);
         new_canvas.setBorder(BorderFactory.createBevelBorder(1));
         current_canvas = new_canvas;
+        current_canvas.loadGraph();
         canvases.add(new_canvas);
         setDefaultLookAndFeelDecorated(true);
-        tabs.add(name, new_canvas);
+        tabs.add(graph.name, new_canvas);
         tabs.setSelectedIndex(tabs.getTabCount() - 1);
     }
 

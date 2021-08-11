@@ -1,5 +1,6 @@
 package Nodes;
 
+import java.awt.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 public class Node implements Serializable {
     private int id;
     private List<Node> children = new ArrayList<>();
+    public Point location;
 
     public void setId(int id){
         this.id = id;

@@ -23,7 +23,7 @@ public class AnswerPanel extends NodePanel {
     /*
         This assembles the panel using a gridbag.
      */
-    public AnswerPanel(MainWindow window, NodePanel parent, Graph graph, Point start) {
+    public AnswerPanel(MainWindow window, NodePanel parent, Graph graph) {
         super(window, parent, graph);
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -53,6 +53,7 @@ public class AnswerPanel extends NodePanel {
     @Override
     public void setNode(Node node) {
         this.node = (AnswerNode) node;
+        text_entry.setText(this.node.getAnswerText());
     }
 
     /*

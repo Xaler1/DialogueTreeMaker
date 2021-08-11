@@ -5,6 +5,7 @@ import Helpers.ComponentListener;
 import Helpers.InConnector;
 import Managers.Graph;
 import Managers.Person;
+import Nodes.AnswerNode;
 import Nodes.DialogueNode;
 import Nodes.Node;
 
@@ -89,7 +90,7 @@ public class ChoicePanel extends NodePanel {
         add_btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                NodePanel new_ans = createAnswer();
+                NodePanel new_ans = createAnswer(null);
                 graph.addAnswerNode(new_ans, "");
                 graph.createRelation(self, new_ans);
                 window.current_canvas.components.add(new_ans);
@@ -104,6 +105,11 @@ public class ChoicePanel extends NodePanel {
     @Override
     public void setNode(Node node) {
         this.node = (DialogueNode) node;
+        for (Node child : node.getChildren()) {
+            createAnswer((AnswerNode) child);
+        }
+        text_entry.setText(this.node.getDialogueText());
+        person_choice.setSelectedItem(this.node.getPerson().name);
         refresh();
     }
 
@@ -133,14 +139,23 @@ public class ChoicePanel extends NodePanel {
     /*
         This adds a new answer panel visually and connects this to a new dialogue node conceptually.
      */
-    public NodePanel createAnswer() {
+    public NodePanel createAnswer(AnswerNode node) {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 1;
         constraints.gridy = answers.size() + 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.9;
         constraints.weighty = 0.3;
-        AnswerPanel answer_panel = new AnswerPanel(window, this, graph, new Point(10, this.getHeight() - 10));
+
+        AnswerPanel answer_panel = null;
+        if (node == null) {
+            answer_panel = new AnswerPanel(window, this, graph);
+            graph.addAnswerNode(answer_panel, "Hello World!");
+            graph.createRelation(this, answer_panel);
+        } else {
+            answer_panel = new AnswerPanel(window, this, graph);
+            graph.assignNodePanel(answer_panel, node.getId());
+        }
         answer_panel.setPreferredSize(new Dimension(190, 30));
         answers.add(answer_panel);
         answer_panel.setNode(graph.getNode(answer_panel));

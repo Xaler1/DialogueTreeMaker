@@ -1,5 +1,6 @@
 package Managers;
 
+import Frames.Canvas;
 import Frames.MainWindow;
 
 import javax.swing.*;
@@ -29,10 +30,13 @@ public class TreeKeeper {
         try {
             destination.createNewFile();
             ObjectOutputStream object_writer = new ObjectOutputStream(new FileOutputStream(destination));
+            for (Canvas canvas : window.canvases) {
+                canvas.writeLayout();
+            }
             object_writer.writeObject(project);
             object_writer.close();
             project.name = destination.getName().replace(".tree", "");
-            window.setName(project.name);
+            window.setTitle(project.name);
         } catch (IOException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getClass().getSimpleName(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -47,13 +51,19 @@ public class TreeKeeper {
             String name = source.getName().replace(".tree", "");
             ObjectInputStream object_reader = new ObjectInputStream(new FileInputStream(source));
             project = (Project) object_reader.readObject();
+            for (Graph graph : project.graphs) {
+                graph.reInit();
+            }
             window.dispose();
             window = new MainWindow(project.graphs, name, this);
         } catch (IOException ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
         } catch (ClassNotFoundException ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error reading from file", "Error", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
+            ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error reading from file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -126,5 +136,9 @@ public class TreeKeeper {
 
     public void removeVariable(int id) {
         project.variables.remove(id);
+    }
+
+    public Collection<Variable> getVariables() {
+        return project.variables.values();
     }
 }

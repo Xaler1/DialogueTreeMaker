@@ -96,6 +96,8 @@ public class DialoguePanel extends NodePanel{
     @Override
     public void setNode(Node node) {
         this.node = (DialogueNode) node;
+        text_entry.setText(this.node.getDialogueText());
+        person_choice.setSelectedItem(this.node.getPerson().name);
         refresh();
     }
 

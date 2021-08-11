@@ -16,6 +16,7 @@ public class VariablePanel extends JPanel {
 
     private final JPanel holder;
     private final TreeKeeper keeper;
+    private int variable_counter = 0;
 
     public VariablePanel(TreeKeeper keeper) {
         this.keeper = keeper;
@@ -36,7 +37,7 @@ public class VariablePanel extends JPanel {
         add_btn.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createVariable("");
+                createVariable(null);
             }
         });
         add(add_btn, constraints);
@@ -47,13 +48,16 @@ public class VariablePanel extends JPanel {
         holder.setLayout(new GridBagLayout());
         JScrollPane pane = new JScrollPane(holder);
         add(pane, constraints);
+
+        for (Variable variable : keeper.getVariables()) {
+            createVariable(variable);
+        }
     }
 
-    private void createVariable(String name) {
-        if (!name.equals("")) {
-
-        } else {
+    private void createVariable(Variable variable) {
+        if (variable == null) {
             while (true) {
+                String name = "";
                 name = (String) JOptionPane.showInputDialog(
                         this,
                         "Enter the name of the variable.",
@@ -74,22 +78,23 @@ public class VariablePanel extends JPanel {
                 } else if (!name.matches("^[[a-zA-Z]+_+]+[[a-zA-Z]*_*\\-*[a-zA-Z]*[0-9]*]*$")) {
                     JOptionPane.showMessageDialog(this, "The name does not conform to the java variable naming standards", "Invalid name", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    Variable variable = keeper.addVariable(name);
+                    variable = keeper.addVariable(name);
                     if (variable == null) {
                         JOptionPane.showMessageDialog(this, "Variables must have unique names", "Invalid name", JOptionPane.ERROR_MESSAGE);
                         continue;
                     }
-                    GridBagConstraints constraints = new GridBagConstraints();
-                    constraints.gridx = 0;
-                    constraints.gridy = 0;
-                    constraints.gridy = keeper.getNumCharacters() - 1;
-                    constraints.anchor = GridBagConstraints.PAGE_START;
-                    constraints.fill = GridBagConstraints.HORIZONTAL;
-                    constraints.weightx = 1;
-                    holder.add(new VariableBlock(variable, keeper), constraints);
-                    return;
+                    break;
                 }
             }
         }
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = variable_counter;
+        constraints.anchor = GridBagConstraints.PAGE_START;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1;
+        holder.add(new VariableBlock(variable, keeper), constraints);
+        revalidate();
+        repaint();
     }
 }

@@ -2,6 +2,10 @@ package Frames;
 
 import Helpers.OutConnector;
 import Managers.Graph;
+import Nodes.DialogueNode;
+import Nodes.EndNode;
+import Nodes.Node;
+import Nodes.StartNode;
 import Panels.*;
 
 import javax.swing.*;
@@ -95,21 +99,44 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 }
             }
         });
+    }
 
+    public void loadGraph() {
+        scale = graph.zoom;
+        for (Node node : graph.getNodes()) {
+            if (node instanceof StartNode) {
+                addStartNode((StartNode) node);
+            } else if (node instanceof EndNode) {
+                addEndNode((EndNode) node);
+            } else if (node instanceof DialogueNode) {
+                DialogueNode temp_node = (DialogueNode) node;
+                if (temp_node.isChoice) {
+                    addChoiceNode(temp_node);
+                } else {
+                    addDialogueNode(temp_node);
+                }
+            }
+        }
     }
 
     /*
         This creates a new start node visually as well as a corresponding start node in the graph.
         Before that it also checks that there isn't already a start node on this graph.
      */
-    public void addStartNode() {
+    public void addStartNode(StartNode node) {
         if (has_start_node) {
             JOptionPane.showMessageDialog(this, "A single graph cannot have more than one start node.", "Start node already in graph", JOptionPane.PLAIN_MESSAGE);
             return;
         }
 
-        StartPanel start_node = new StartPanel(window, this.getMousePosition());
-        graph.addStartNode(start_node);
+        StartPanel start_node = null;
+        if (node == null) {
+            start_node = new StartPanel(window, this.getMousePosition());
+            graph.addStartNode(start_node);
+        } else {
+            start_node = new StartPanel(window, node.location);
+            graph.assignNodePanel(start_node, node.getId());
+        }
         start_node.setNode(graph.getNode(start_node));
         add(start_node);
         components.add(start_node);
@@ -120,9 +147,16 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     /*
         This creates a new end node visually (a panel) as well as a corresponding end node in the graph.
      */
-    public void addEndNode() {
-        EndPanel end_node = new EndPanel(window, getMousePosition());
-        graph.addEndNode(end_node);
+    public void addEndNode(EndNode node) {
+
+        EndPanel end_node = null;
+        if (node == null) {
+            end_node = new EndPanel(window, getMousePosition());
+            graph.addEndNode(end_node);
+        } else {
+            end_node = new EndPanel(window, node.location);
+            graph.assignNodePanel(end_node, node.getId());
+        }
         end_node.setNode(graph.getNode(end_node));
         this.add(end_node);
         components.add(end_node);
@@ -132,9 +166,17 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     /*
         This creates a new dialogue node visually (a panel) as well as a corresponding end node in the graph.
      */
-    public void addDialogueNode() {
-        DialoguePanel dialogue_node = new DialoguePanel(window, getMousePosition());
-        graph.addDialogueNode(dialogue_node, "Hello world");
+    public void addDialogueNode(DialogueNode node) {
+
+        DialoguePanel dialogue_node = null;
+        if (node == null) {
+            dialogue_node = new DialoguePanel(window, getMousePosition());
+            graph.addDialogueNode(dialogue_node, "Hello world");
+        } else {
+            dialogue_node = new DialoguePanel(window, node.location);
+            graph.assignNodePanel(dialogue_node, node.getId());
+        }
+
         dialogue_node.setNode(graph.getNode(dialogue_node));
         components.add(dialogue_node);
         add(dialogue_node);
@@ -144,9 +186,16 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     /*
         This creates a new choice node visually (a panel) as well as a corresponding end node in the graph.
      */
-    public void addChoiceNode() {
-        ChoicePanel dialogue_node = new ChoicePanel(window, graph, getMousePosition());
-        graph.addDialogueNode(dialogue_node, "Hello world");
+    public void addChoiceNode(DialogueNode node) {
+
+        ChoicePanel dialogue_node = null;
+        if (node == null) {
+            dialogue_node = new ChoicePanel(window, graph, getMousePosition());
+            graph.addChoiceNode(dialogue_node, "Hello world");
+        } else {
+            dialogue_node = new ChoicePanel(window, graph, node.location);
+            graph.assignNodePanel(dialogue_node, node.getId());
+        }
         dialogue_node.setNode(graph.getNode(dialogue_node));
         add(dialogue_node);
         components.add(dialogue_node);
@@ -253,6 +302,13 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     public void refreshAll() {
         for (NodePanel panel : components) {
             panel.refresh();
+        }
+    }
+
+    public void writeLayout() {
+        graph.zoom = scale;
+        for (NodePanel node : components) {
+            graph.getNode(node).location = node.getLocation(false);
         }
     }
 

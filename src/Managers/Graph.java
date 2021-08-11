@@ -1,18 +1,22 @@
 package Managers;
 
 import Nodes.*;
+import Panels.NodePanel;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 
 
 public class Graph implements Serializable {
 
     public String name;
-    private HashMap<Component, Integer> componentKeys = new HashMap<Component, Integer>();
+    private transient HashMap<Component, Integer> componentKeys = new HashMap<Component, Integer>();
     private HashMap<Integer, Node> idKeys = new HashMap<Integer, Node>();
     private int numNodes = 0;
+    public Point2D zoom = new Point2D.Float(1, 1);
 
     public Graph(String name) {
         this.name = name;
@@ -35,7 +39,11 @@ public class Graph implements Serializable {
     }
 
     public void addDialogueNode(Component dialogueNodeElement, String dialogueText) {
-        addNode(dialogueNodeElement, new DialogueNode(dialogueText));
+        addNode(dialogueNodeElement, new DialogueNode(dialogueText, false));
+    }
+
+    public void addChoiceNode(Component choiceNodeElement, String dialogueText) {
+        addNode(choiceNodeElement, new DialogueNode(dialogueText, true));
     }
 
     public void addAnswerNode(Component answerNodeElement, String answerText) {
@@ -53,6 +61,18 @@ public class Graph implements Serializable {
     public void removeNode(Component node) {
         idKeys.remove(componentKeys.get(node));
         componentKeys.remove(node);
+    }
+
+    public void reInit() {
+        componentKeys = new HashMap<>();
+    }
+
+    public void assignNodePanel(NodePanel node, int id) {
+        componentKeys.put(node, id);
+    }
+
+    public Collection<Node> getNodes() {
+        return idKeys.values();
     }
 
     public void writeToFile() {

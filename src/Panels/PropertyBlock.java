@@ -81,6 +81,14 @@ public class PropertyBlock extends JPanel {
                 checkValue(e);
             }
         });
+        value_entry.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (type_selector.getSelectedIndex() != 3) {
+                    property.value = value_entry.getText();
+                }
+            }
+        });
         add(value_entry, constraints);
         value_entry.setText(property.value);
 

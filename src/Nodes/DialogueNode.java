@@ -5,9 +5,11 @@ import Managers.Person;
 public class DialogueNode extends Node {
     private String dialogueText;
     private Person person = null;
+    public final boolean isChoice;
 
-    public DialogueNode(String dialogueText){
+    public DialogueNode(String dialogueText, boolean isChoice){
         this.dialogueText = dialogueText;
+        this.isChoice = isChoice;
     }
 
     public String getDialogueText(){
@@ -20,6 +22,10 @@ public class DialogueNode extends Node {
 
     public void setPerson(Person person) {
         this.person = person;
+    }
+
+    public Person getPerson() {
+        return person;
     }
 
     public void removeCharacter() {

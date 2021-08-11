@@ -16,9 +16,9 @@ public class Person implements Serializable {
 
     public final int id;
     private int property_id = 0;
-    private final PropertyChangeSupport notifier;
+    private transient PropertyChangeSupport notifier;
     public String name;
-    public Image image;
+    public transient Image image;
     public String img_name;
     public Map<Integer, Property> properties;
 
@@ -37,6 +37,10 @@ public class Person implements Serializable {
         this.name = name;
         this.notifier = new PropertyChangeSupport(this);
         properties = new HashMap<>();
+    }
+
+    public void reInitNotifier() {
+        notifier = new PropertyChangeSupport(this);
     }
 
     /*

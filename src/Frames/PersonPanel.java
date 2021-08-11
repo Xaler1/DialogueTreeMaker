@@ -1,5 +1,6 @@
 package Frames;
 
+import Managers.Person;
 import Managers.TreeKeeper;
 import Panels.PersonBlock;
 
@@ -18,6 +19,7 @@ import java.beans.PropertyChangeSupport;
 public class PersonPanel extends JPanel implements PropertyChangeListener {
     private final TreeKeeper keeper;
     private final PropertyChangeSupport notifier;
+    private int person_counter = 0;
 
     JButton button;
     JScrollPane scroll_pane;
@@ -70,7 +72,7 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                createCharacter("");
+                createCharacter(null);
             }
         });
         add(button, constraints);
@@ -82,15 +84,20 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
         person_holder.setLayout(new GridBagLayout());
         scroll_pane  = new JScrollPane(person_holder);
         add(scroll_pane, constraints);
+
+        for (Person person : keeper.getPeople()) {
+            createCharacter(person);
+        }
     }
 
     /*
         This handles character creation - adding a new character to the project and also a character block to the list.
         First the user is prompted for a name until they enter a name that is not empty and unique.
      */
-    private void createCharacter(String name) {
-        if (name.equals("")) {
+    private void createCharacter(Person person) {
+        if (person == null) {
             while (true) {
+                String name = "";
                 name = (String) JOptionPane.showInputDialog(
                         this,
                         "Enter the name of the character.",
@@ -111,23 +118,27 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
                         JOptionPane.showMessageDialog(this, "You need a unique character name", "Invalid name", JOptionPane.ERROR_MESSAGE);
                     } else {
                         //TODO: figure out how to added the blocks from the top while preserving all the filling properties
-                        GridBagConstraints constraints = new GridBagConstraints();
-                        keeper.getPersonByName(name).addListener(this);
-                        constraints.gridx = 0;
-                        constraints.gridy = keeper.getNumCharacters() - 1;
-                        constraints.anchor = GridBagConstraints.PAGE_START;
-                        constraints.fill = GridBagConstraints.HORIZONTAL;
-                        constraints.weightx = 1;
-                        PersonBlock new_block = new PersonBlock(new_id, keeper, this);
-                        notifier.firePropertyChange("person_create", "old", "new");
-                        person_holder.add(new_block, constraints);
-                        revalidate();
-                        repaint();
+                        person = keeper.getPersonByName(name);
                         break;
                     }
                 }
             }
+        } else {
+            person.reInitNotifier();
         }
+        GridBagConstraints constraints = new GridBagConstraints();
+        person.addListener(this);
+        constraints.gridx = 0;
+        constraints.gridy = person_counter;
+        person_counter++;
+        constraints.anchor = GridBagConstraints.PAGE_START;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1;
+        PersonBlock new_block = new PersonBlock(person.id, keeper, this);
+        notifier.firePropertyChange("person_create", "old", "new");
+        person_holder.add(new_block, constraints);
+        revalidate();
+        repaint();
     }
 
     /*
