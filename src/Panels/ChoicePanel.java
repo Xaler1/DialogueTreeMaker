@@ -12,10 +12,7 @@ import Nodes.Node;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -75,6 +72,12 @@ public class ChoicePanel extends NodePanel {
         constraints.weighty = 0.5;
         text_entry = new JTextArea("Hello world!");
         text_entry.setLineWrap(true);
+        text_entry.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                node.setDialogueText(text_entry.getText());
+            }
+        });
         pane = new JScrollPane(text_entry);
         pane.setPreferredSize(new Dimension(190, 50));
         add(pane, constraints);
@@ -90,10 +93,7 @@ public class ChoicePanel extends NodePanel {
         add_btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                NodePanel new_ans = createAnswer(null);
-                graph.addAnswerNode(new_ans, "");
-                graph.createRelation(self, new_ans);
-                window.current_canvas.components.add(new_ans);
+                createAnswer(null);
             }
         });
         add_btn.setPreferredSize(new Dimension(30, 30));
@@ -109,7 +109,9 @@ public class ChoicePanel extends NodePanel {
             createAnswer((AnswerNode) child);
         }
         text_entry.setText(this.node.getDialogueText());
-        person_choice.setSelectedItem(this.node.getPerson().name);
+        if (this.node.getPerson() != null) {
+            person_choice.setSelectedItem(this.node.getPerson().name);
+        }
         refresh();
     }
 
@@ -161,6 +163,7 @@ public class ChoicePanel extends NodePanel {
         answer_panel.setNode(graph.getNode(answer_panel));
         add(answer_panel, constraints);
         rescale(1, new Point(0, 0));
+        window.current_canvas.components.add(answer_panel);
         return answer_panel;
     }
 

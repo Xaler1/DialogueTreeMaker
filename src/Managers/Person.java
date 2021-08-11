@@ -1,7 +1,5 @@
 package Managers;
 
-import Helpers.Property;
-
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;

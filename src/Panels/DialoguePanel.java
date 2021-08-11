@@ -10,10 +10,10 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 
 /*
     This is a visual representation of a dialogue node. A character can be assigned so that it's properties can be
@@ -67,10 +67,9 @@ public class DialoguePanel extends NodePanel{
         constraints.weighty = 0.5;
         text_entry = new JTextArea("Hello world!");
         text_entry.setLineWrap(true);
-        text_entry.addKeyListener(new KeyAdapter() {
+        text_entry.addFocusListener(new FocusAdapter() {
             @Override
-            public void keyTyped(KeyEvent e) {
-                super.keyTyped(e);
+            public void focusLost(FocusEvent e) {
                 node.setDialogueText(text_entry.getText());
             }
         });
@@ -97,7 +96,9 @@ public class DialoguePanel extends NodePanel{
     public void setNode(Node node) {
         this.node = (DialogueNode) node;
         text_entry.setText(this.node.getDialogueText());
-        person_choice.setSelectedItem(this.node.getPerson().name);
+        if (this.node.getPerson() != null) {
+            person_choice.setSelectedItem(this.node.getPerson().name);
+        }
         refresh();
     }
 

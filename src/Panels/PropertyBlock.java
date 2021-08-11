@@ -1,8 +1,8 @@
 package Panels;
 
 import Frames.CharacterEditWindow;
-import Helpers.Property;
 import Managers.Person;
+import Managers.Property;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

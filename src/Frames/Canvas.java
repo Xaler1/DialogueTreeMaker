@@ -108,13 +108,23 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 addStartNode((StartNode) node);
             } else if (node instanceof EndNode) {
                 addEndNode((EndNode) node);
-            } else if (node instanceof DialogueNode) {
-                DialogueNode temp_node = (DialogueNode) node;
+            } else if (node instanceof DialogueNode temp_node) {
                 if (temp_node.isChoice) {
                     addChoiceNode(temp_node);
                 } else {
                     addDialogueNode(temp_node);
                 }
+            }
+        }
+        for (Node node : graph.getNodes()) {
+            NodePanel parent = graph.getPanel(node);
+            if (parent instanceof ChoicePanel) {
+                continue;
+            }
+            for (Node child : node.getChildren()) {
+                NodePanel child_panel = graph.getPanel(child);
+                parent.getOutConnector().destination = child_panel.getInConnector();
+                child_panel.getInConnector().addConnection(parent);
             }
         }
     }

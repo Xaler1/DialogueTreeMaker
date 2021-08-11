@@ -1,7 +1,7 @@
 package Frames;
 
-import Helpers.Property;
 import Managers.Person;
+import Managers.Property;
 import Managers.TreeKeeper;
 import Panels.PropertyBlock;
 

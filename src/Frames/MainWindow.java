@@ -323,7 +323,7 @@ public class MainWindow extends JFrame implements MouseListener {
                     current_canvas.updateLines();
                     Thread.sleep(10);
                 }
-                if (potential_end_component != null) { ;
+                if (potential_end_component != null) {
                     current_canvas.createLink(component, potential_end_component);
                 }
                 current_canvas.temp_line = null;

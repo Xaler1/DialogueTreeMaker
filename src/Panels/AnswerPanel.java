@@ -8,6 +8,8 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 /*
     This is a visual representation of an answer node. Users can use this to add answer text, remove this node or connect it
@@ -36,6 +38,12 @@ public class AnswerPanel extends NodePanel {
 
         text_entry = new JTextArea("Hello world");
         text_entry.setLineWrap(true);
+        text_entry.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                node.setAnswerText(text_entry.getText());
+            }
+        });
         pane = new JScrollPane(text_entry);
         pane.setPreferredSize(new Dimension(150, 20));
         add(pane, constraints);
