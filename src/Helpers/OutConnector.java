@@ -1,6 +1,7 @@
 package Helpers;
 
 import Frames.MainWindow;
+import Managers.Conditional;
 import Panels.NodePanel;
 
 import javax.imageio.ImageIO;
@@ -17,6 +18,7 @@ public class OutConnector extends JLabel implements Serializable {
     private final NodePanel parent;
     private final MainWindow window;
     public InConnector destination;
+    public Conditional conditional = null;
     private Image source_img;
 
     /*
@@ -39,6 +41,10 @@ public class OutConnector extends JLabel implements Serializable {
     @Override
     public NodePanel getParent() {
         return parent;
+    }
+
+    public void setConditional(Conditional conditional) {
+        this.conditional = conditional;
     }
 
     /*

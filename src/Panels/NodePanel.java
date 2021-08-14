@@ -102,6 +102,10 @@ public abstract class NodePanel extends JPanel implements Serializable {
         this.setSize((int)(this.getWidth() * mod), (int)(this.getHeight() * mod));
     }
 
+    public void rescale() {
+        rescale(1, new Point(0, 0));
+    }
+
     /*
         Overrides the default method to return the location of the node on the canvas instead of the location inside the
         parent. (In case it is a nested panel where the canvas is not the parrent.)
