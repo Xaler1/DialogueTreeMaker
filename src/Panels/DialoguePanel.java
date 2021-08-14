@@ -63,7 +63,7 @@ public class DialoguePanel extends NodePanel{
         add(person_choice, constraints);
 
         constraints.gridy = 1;
-        constraints.gridheight = 3;
+        constraints.gridheight = 2;
         constraints.weighty = 0.5;
         text_entry = new JTextArea("Hello world!");
         text_entry.setLineWrap(true);
@@ -88,6 +88,11 @@ public class DialoguePanel extends NodePanel{
         constraints.gridx = 2;
         out_connector = new OutConnector(this, window);
         add(out_connector, constraints);
+
+        constraints.gridy = 2;
+        JButton conditional_btn = new JButton("+");
+        conditional_btn.setPreferredSize(new Dimension(30, 30));
+        add(conditional_btn, constraints);
 
         rescale(1, new Point(0, 0));
     }

@@ -143,7 +143,8 @@ public class ChoicePanel extends NodePanel {
      */
     public NodePanel createAnswer(AnswerNode node) {
         GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 1;
+        constraints.gridx = 0;
+        constraints.gridwidth = 3;
         constraints.gridy = answers.size() + 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.9;
