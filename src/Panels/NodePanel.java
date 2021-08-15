@@ -4,6 +4,7 @@ import Frames.Canvas;
 import Frames.MainWindow;
 import Helpers.InConnector;
 import Helpers.OutConnector;
+import Managers.Conditional;
 import Managers.Graph;
 import Managers.TreeKeeper;
 import Nodes.Node;
@@ -11,6 +12,8 @@ import Nodes.Node;
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
     This is the parent class of all the node panels. It handles the movement of the panels during zoom. (Since zooming
@@ -25,6 +28,7 @@ public abstract class NodePanel extends JPanel implements Serializable {
     protected final Canvas canvas;
     protected Graph graph = null;
     protected final TreeKeeper keeper;
+    protected Map<Conditional, ConditionalBlock> conditional_panels;
 
     /*
         Several constructor to account for the fact that not all panels will have default parents or need a reference to
@@ -67,7 +71,11 @@ public abstract class NodePanel extends JPanel implements Serializable {
     public void refresh(){}
 
     private void setup() {
+        conditional_panels = new HashMap<>();
+    }
 
+    public NodePanel getConditionalPanel(Conditional conditional) {
+        return conditional_panels.get(conditional);
     }
 
     //Sets the out connector.

@@ -188,6 +188,14 @@ public class MainWindow extends JFrame implements MouseListener {
         //constraints.ipadx = (int) (screen_size.width * 0.8);
         //constraints.ipady = (int) (screen_size.height);
         tabs.setPreferredSize(new Dimension(1000, 600));
+        tabs.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (e.getOppositeComponent() != null && e.getOppositeComponent() instanceof JButton) {
+                    tabs.requestFocusInWindow();
+                }
+            }
+        });
         setJMenuBar(menu_bar);
         add(tabs, constraints);
         character_panel = new PersonPanel(keeper);

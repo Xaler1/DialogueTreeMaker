@@ -1,6 +1,10 @@
 package Managers;
 
-public class Conditional {
+import Nodes.Node;
+
+import java.io.Serializable;
+
+public class Conditional implements Serializable {
 
     private Person person;
     private boolean is_default = false;
@@ -9,6 +13,8 @@ public class Conditional {
     public String comparator = "=";
     public String var2_type = "int";
     public String var2 = "1";
+
+    public Node child;
 
     public Conditional(Person person) {
         this.person = person;

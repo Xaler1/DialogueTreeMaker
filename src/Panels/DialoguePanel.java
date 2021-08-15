@@ -11,12 +11,7 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.LinkedList;
-import java.util.List;
+import java.awt.event.*;
 
 
 /*
@@ -28,9 +23,8 @@ public class DialoguePanel extends NodePanel{
     private final JTextArea text_entry;
     private final JScrollPane pane;
     private final JComboBox<String> person_choice;
-    private final JButton conditional_btn;
+    private final JLabel conditional_btn;
     private DialogueNode node;
-    private List<ConditionalBlock> conditional_panels;
 
     private int person_id = -1;
     private boolean refreshing = false;
@@ -41,7 +35,6 @@ public class DialoguePanel extends NodePanel{
     //TODO: Find a way so that the connectors are the same size physically as they are visually.
     public DialoguePanel(MainWindow window, Point start) {
         super(window);
-        conditional_panels = new LinkedList<>();
 
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
@@ -99,9 +92,18 @@ public class DialoguePanel extends NodePanel{
 
         constraints.gridy = 3;
         constraints.gridx = 1;
-        conditional_btn = new JButton("Add conditional");
+        constraints.weighty = 0.1;
+        conditional_btn = new JLabel("Add conditional");
         conditional_btn.setPreferredSize(new Dimension(30, 30));
-        conditional_btn.addActionListener(e -> createConditional(null));
+        conditional_btn.setBorder(BorderFactory.createBevelBorder(1));
+        conditional_btn.setBackground(Color.WHITE);
+        conditional_btn.setHorizontalAlignment(SwingConstants.CENTER);
+        conditional_btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                createConditional(null);
+            }
+        });
         add(conditional_btn, constraints);
 
         rescale();
@@ -121,7 +123,8 @@ public class DialoguePanel extends NodePanel{
         constraints.gridwidth = 3;
         add(block, constraints);
         rescale();
-        conditional_panels.add(block);
+        conditional_panels.put(conditional, block);
+        canvas.components.add(block);
     }
 
     @Override
@@ -130,6 +133,9 @@ public class DialoguePanel extends NodePanel{
         text_entry.setText(this.node.getDialogueText());
         if (this.node.getPerson() != null) {
             person_choice.setSelectedItem(this.node.getPerson().name);
+        }
+        for (Conditional conditional : node.getConditionals()) {
+            createConditional(conditional);
         }
         refresh();
     }
@@ -164,13 +170,13 @@ public class DialoguePanel extends NodePanel{
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);
-        setSize((int)(350 * canvas.scale.getX()), (int)(200 * canvas.scale.getY() + 30 * conditional_panels.size()));
+        setSize((int)(350 * canvas.scale.getX()), (int)((200 + 30 * conditional_panels.size()) * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         conditional_btn.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         in_connector.rescale();
         out_connector.rescale();
-        for (ConditionalBlock block : conditional_panels) {
+        for (ConditionalBlock block : conditional_panels.values()) {
             block.rescale();
         }
     }

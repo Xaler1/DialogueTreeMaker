@@ -1,6 +1,7 @@
 package Frames;
 
 import Helpers.OutConnector;
+import Managers.Conditional;
 import Managers.Graph;
 import Nodes.DialogueNode;
 import Nodes.EndNode;
@@ -126,6 +127,12 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 parent.getOutConnector().destination = child_panel.getInConnector();
                 child_panel.getInConnector().addConnection(parent);
             }
+            for (Conditional conditional : node.getConditionals()) {
+                NodePanel child_panel = graph.getPanel(conditional.child);
+                NodePanel conditional_panel = parent.getConditionalPanel(conditional);
+                conditional_panel.getOutConnector().destination = child_panel.getInConnector();
+                child_panel.getInConnector().addConnection(conditional_panel);
+            }
         }
     }
 
@@ -248,7 +255,11 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
         component_end.getInConnector().addConnection(out_connector.getParent());
         updateLines();
         temp_line = null;
-        graph.createRelation(out_connector.getParent(), component_end);
+        if (out_connector.conditional != null) {
+            out_connector.conditional.child = graph.getNode(component_end);
+        } else {
+            graph.createRelation(out_connector.getParent(), component_end);
+        }
     }
 
     /*
@@ -285,7 +296,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
         NodePanel to_remove = null;
         for (NodePanel panel : components) {
             Point point = getMousePosition();
-            Point loc = panel.getLocation();
+            Point loc = panel.getLocation(false);
             point.translate(-loc.x, -loc.y);
             if (panel.contains(point)) {
                 panel.removeAllInConnections();
@@ -318,6 +329,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     public void writeLayout() {
         graph.zoom = scale;
         for (NodePanel node : components) {
+            if (node instanceof AnswerPanel || node instanceof ConditionalBlock) continue;
             graph.getNode(node).location = node.getLocation(false);
         }
     }
