@@ -302,7 +302,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
             if (panel.contains(point)) {
                 panel.removeAllInConnections();
                 panel.removeAllOutConnections();
-                panel.removeAllChildren();
+                panel.removeAllInNodeChildren();
                 graph.removeNode(panel);
                 to_remove = panel;
                 break;

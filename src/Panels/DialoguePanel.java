@@ -55,7 +55,7 @@ public class DialoguePanel extends NodePanel{
         person_choice = new JComboBox<>();
         person_choice.addItem("None");
         person_choice.addItemListener(e -> {
-            if (refreshing || person_choice.getSelectedItem().equals("None")) return;
+            if (refreshing) return;
             Person person = keeper.getPersonByName((String)(person_choice.getSelectedItem()));
             node.setPerson(person);
             if (person == null) return;
@@ -187,9 +187,6 @@ public class DialoguePanel extends NodePanel{
         conditional_btn.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         in_connector.rescale();
         out_connector.rescale();
-        for (ConditionalBlock block : conditional_panels.values()) {
-            block.rescale();
-        }
     }
 
     @Override
@@ -206,7 +203,7 @@ public class DialoguePanel extends NodePanel{
     }
 
     @Override
-    public void removeAllChildren() {
+    public void removeAllInNodeChildren() {
         for (ConditionalBlock block : conditional_panels.values()) {
             removeChild(block);
         }

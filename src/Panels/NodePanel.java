@@ -28,7 +28,7 @@ public abstract class NodePanel extends JPanel implements Serializable {
     protected final Canvas canvas;
     protected Graph graph = null;
     protected final TreeKeeper keeper;
-    protected Map<Conditional, ConditionalBlock> conditional_panels;
+    public Map<Conditional, ConditionalBlock> conditional_panels;
 
     /*
         Several constructor to account for the fact that not all panels will have default parents or need a reference to
@@ -122,7 +122,8 @@ public abstract class NodePanel extends JPanel implements Serializable {
     public Point getLocation() {
         Point loc = super.getLocation();
         if (parent != null) {
-            loc.translate(parent.getX(), parent.getY());
+            Point parent_loc = parent.getLocation();
+            loc.translate(parent_loc.x, parent_loc.y);
         }
         return loc;
     }
@@ -161,5 +162,5 @@ public abstract class NodePanel extends JPanel implements Serializable {
 
     public void removeChild(NodePanel panel) {}
 
-    public void removeAllChildren() {}
+    public void removeAllInNodeChildren() {}
 }

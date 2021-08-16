@@ -55,12 +55,16 @@ public class ChoicePanel extends NodePanel {
         addMouseListener(new ComponentListener(window, this));
 
         person_choice = new JComboBox<>();
+        person_choice.addItem("None");
         person_choice.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if (refreshing) return;
                 Person person = keeper.getPersonByName((String)(person_choice.getSelectedItem()));
                 node.setPerson(person);
+                for (AnswerPanel answer : answers) {
+                    answer.setPerson(person);
+                }
                 if (person == null) return;
                 person_id = person.id;
             }
@@ -124,6 +128,7 @@ public class ChoicePanel extends NodePanel {
         refreshing = true;
         boolean contains_old = false;
         person_choice.removeAllItems();
+        person_choice.addItem("None");
         for (Person person : keeper.getPeople()) {
             person_choice.addItem(person.name);
             if (person.id == person_id) {
@@ -148,7 +153,7 @@ public class ChoicePanel extends NodePanel {
         constraints.gridy = answers.size() + 2;
         constraints.fill = GridBagConstraints.BOTH;
         constraints.weightx = 1.9;
-        constraints.weighty = 0.3;
+        constraints.weighty = 0.4;
 
         AnswerPanel answer_panel = null;
         if (node == null) {
@@ -159,7 +164,7 @@ public class ChoicePanel extends NodePanel {
             answer_panel = new AnswerPanel(window, this, graph);
             graph.assignNodePanel(answer_panel, node.getId());
         }
-        answer_panel.setPreferredSize(new Dimension(190, 30));
+        answer_panel.setPreferredSize(new Dimension(190, 50));
         answers.add(answer_panel);
         answer_panel.setNode(graph.getNode(answer_panel));
         add(answer_panel, constraints);
@@ -175,7 +180,23 @@ public class ChoicePanel extends NodePanel {
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);
-        this.setSize((int)(300 * canvas.scale.getX()), (int)((150 + 50 * answers.size()) * canvas.scale.getY()));
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 3;
+        constraints.weightx = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        int size = 150;
+        for (AnswerPanel panel : answers) {
+            constraints.weighty = 0.6 + 0.4 * panel.conditional_panels.size();
+            size += 100;
+            size += 40 * panel.conditional_panels.size();
+            remove(panel);
+            panel.setPreferredSize(new Dimension(190, (int) ((40 + panel.conditional_panels.size()) * canvas.scale.getY())));
+            add(panel, constraints);
+            constraints.gridy++;
+        }
+        this.setSize((int)(300 * canvas.scale.getX()), (int)(size * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         in_connector.rescale();
@@ -187,5 +208,14 @@ public class ChoicePanel extends NodePanel {
         }
         Image scaled = img.getScaledInstance((int)(30 * canvas.scale.getX()), (int)(30 * canvas.scale.getY()), Image.SCALE_FAST);
         add_btn.setIcon(new ImageIcon(scaled));
+    }
+
+    @Override
+    public void removeAllInNodeChildren() {
+        for (AnswerPanel child : answers) {
+            child.removeAllInNodeChildren();
+            canvas.removeOutConnections(child);
+            graph.removeNode(child);
+        }
     }
 }
