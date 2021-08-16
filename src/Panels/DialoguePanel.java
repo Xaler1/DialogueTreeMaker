@@ -62,6 +62,9 @@ public class DialoguePanel extends NodePanel{
             person_id = person.id;
         });
         person_choice.setPreferredSize(new Dimension(190, 10));
+        for (Person person : keeper.getPeople()) {
+            person_choice.addItem(person.name);
+        }
         add(person_choice, constraints);
 
         constraints.gridy = 1;
@@ -113,6 +116,8 @@ public class DialoguePanel extends NodePanel{
     private void createConditional(Conditional conditional) {
         if (conditional == null) {
             conditional = node.addConditional();
+        } else {
+            conditional.reInit();
         }
         ConditionalBlock block = new ConditionalBlock(window, conditional, this);
         GridBagConstraints constraints = new GridBagConstraints();
@@ -127,6 +132,7 @@ public class DialoguePanel extends NodePanel{
         conditional_panels.put(conditional, block);
         canvas.components.add(block);
         conditional.addListener(block);
+        rescale();
     }
 
     @Override
@@ -183,6 +189,26 @@ public class DialoguePanel extends NodePanel{
         out_connector.rescale();
         for (ConditionalBlock block : conditional_panels.values()) {
             block.rescale();
+        }
+    }
+
+    @Override
+    public void removeChild(NodePanel panel) {
+        ConditionalBlock child = (ConditionalBlock) panel;
+        if (child.out_connector.destination != null) {
+            child.out_connector.destination.connections.remove(child.out_connector);
+        }
+        node.removeConditional(child.conditional);
+        canvas.components.remove(panel);
+        conditional_panels.remove(child.conditional);
+        remove(panel);
+        rescale();
+    }
+
+    @Override
+    public void removeAllChildren() {
+        for (ConditionalBlock block : conditional_panels.values()) {
+            removeChild(block);
         }
     }
 }

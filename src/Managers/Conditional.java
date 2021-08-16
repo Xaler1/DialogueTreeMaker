@@ -2,6 +2,7 @@ package Managers;
 
 import Nodes.Node;
 
+import javax.swing.*;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -15,7 +16,7 @@ public class Conditional implements Serializable {
     public String comparator = "=";
     public String var2_type = "int";
     public String var2 = "1";
-    private final PropertyChangeSupport notifier = new PropertyChangeSupport(this);
+    private transient PropertyChangeSupport notifier = new PropertyChangeSupport(this);
 
     public Node child;
 
@@ -30,6 +31,10 @@ public class Conditional implements Serializable {
     public Conditional(boolean is_default) {
         this.is_default = is_default;
         person = null;
+    }
+
+    public void reInit() {
+        notifier = new PropertyChangeSupport(this);
     }
 
     public boolean is_satisfied() {
@@ -69,5 +74,17 @@ public class Conditional implements Serializable {
                 }
         }
         return false;
+    }
+
+    public void fireUpdate() {
+        SwingWorker worker = new SwingWorker() {
+            @Override
+            protected Object doInBackground() throws Exception {
+                Thread.sleep(100);
+                notifier.firePropertyChange("conditional_change", "0", "1");
+                return null;
+            }
+        };
+        worker.execute();
     }
 }

@@ -7,6 +7,7 @@ import Managers.Variable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 public class ConditionalEditWindow extends JDialog {
 
@@ -83,6 +84,22 @@ public class ConditionalEditWindow extends JDialog {
         var1_entry.setPreferredSize(new Dimension(100, 30));
         var1_entry.setFont(font);
         var1_entry.setText(conditional.var1);
+        var1_entry.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                var1_entry.setEditable(true);
+                String type = conditional.var1_type;
+                if (type.equals("string") || type.equals("int") || type.equals("float")) {
+                    conditional.var1 = var1_entry.getText();
+                }
+            }
+        });
+        var1_entry.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                checkEntry(e, var1_entry, conditional.var1_type);
+            }
+        });
         add(var1_entry, constraints);
 
         var1_selector = new JComboBox<>();
@@ -101,6 +118,9 @@ public class ConditionalEditWindow extends JDialog {
         comparator_selector.setPreferredSize(new Dimension(40, 30));
         comparator_selector.setFont(font);
         comparator_selector.setSelectedItem(conditional.comparator);
+        comparator_selector.addItemListener(e -> {
+            conditional.comparator = (String) e.getItem();
+        });
         add(comparator_selector, constraints);
 
         constraints.gridx = 2;
@@ -108,11 +128,34 @@ public class ConditionalEditWindow extends JDialog {
         var2_entry.setPreferredSize(new Dimension(100, 30));
         var2_entry.setFont(font);
         var2_entry.setText(conditional.var1);
+        var2_entry.addFocusListener(new FocusAdapter() {
+            @Override
+            public void focusLost(FocusEvent e) {
+                var2_entry.setEditable(true);
+                String type = conditional.var2_type;
+                if (type.equals("string") || type.equals("int") || type.equals("float")) {
+                    conditional.var2 = var2_entry.getText();
+                }
+            }
+        });
+        var2_entry.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                checkEntry(e, var2_entry, conditional.var2_type);
+            }
+        });
         add(var2_entry, constraints);
 
         var2_selector = new JComboBox<>();
         var2_selector.setPreferredSize(new Dimension(100, 30));
         var2_selector.setFont(font);
+        var2_selector.setSelectedItem(conditional.var2);
+        var2_selector.addItemListener(e -> {
+            String type = conditional.var2_type;
+            if (type.equals("bool") || type.equals("Person Property") || type.equals("Variable")) {
+                conditional.var2 = (String) e.getItem();
+            }
+        });
         add(var2_selector, constraints);
 
         constraints.gridy = 0;
@@ -130,6 +173,13 @@ public class ConditionalEditWindow extends JDialog {
         setVar1Defaults();
         setVar2SelectorDefaults();
         setVar2Defaults();
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                conditional.fireUpdate();
+            }
+        });
     }
 
     private void setDefaults() {
@@ -170,6 +220,7 @@ public class ConditionalEditWindow extends JDialog {
     }
 
     private void setVar1Defaults() {
+        String last_var1 = conditional.var1;
         var1_selector.removeAllItems();
         if (conditional.var1_type.equals("float") || conditional.var1_type.equals("int") || conditional.var1_type.equals("string")) {
             var1_entry.setVisible(true);
@@ -178,17 +229,39 @@ public class ConditionalEditWindow extends JDialog {
             var1_entry.setVisible(false);
             var1_selector.setVisible(true);
         }
-        if (conditional.var1_type.equals("bool")) {
-            var1_selector.addItem("true");
-            var1_selector.addItem("false");
-        } else if (conditional.var1_type.equals("Person Property")) {
-            for (Property property : conditional.person.properties.values()) {
-                var1_selector.addItem(property.name);
-            }
-        } else if (conditional.var1_type.equals("Variable")) {
-            for (Variable variable : keeper.getVariables()) {
-                var1_selector.addItem(variable.name);
-            }
+        switch (conditional.var1_type) {
+            case "bool":
+                var1_selector.addItem("true");
+                var1_selector.addItem("false");
+                break;
+            case "int":
+                var1_entry.setText("0");
+                try {
+                    var1_entry.setText(String.valueOf(Integer.parseInt(last_var1)));
+                } catch (NumberFormatException ignored) {}
+                conditional.var1 = var1_entry.getText();
+                break;
+            case "float":
+                var1_entry.setText("0.0");
+                try {
+                    var1_entry.setText(String.valueOf(Float.parseFloat(last_var1)));
+                } catch (NumberFormatException ignored) {}
+                conditional.var1 = var1_entry.getText();
+                break;
+            case "string":
+                var1_entry.setText("");
+                conditional.var1 = var1_entry.getText();
+                break;
+            case "Person Property":
+                for (Property property : conditional.person.properties.values()) {
+                    var1_selector.addItem(property.name);
+                }
+                break;
+            case "Variable":
+                for (Variable variable : keeper.getVariables()) {
+                    var1_selector.addItem(variable.name);
+                }
+                break;
         }
     }
 
@@ -230,15 +303,18 @@ public class ConditionalEditWindow extends JDialog {
                 try {
                     var2_entry.setText(String.valueOf(Integer.parseInt(last_var2)));
                 } catch (NumberFormatException ignored) {}
+                conditional.var2 = var2_entry.getText();
                 break;
             case "float":
                 var2_entry.setText("0.0");
                 try {
                     var2_entry.setText(String.valueOf(Float.parseFloat(last_var2)));
                 } catch (NumberFormatException ignored) {}
+                conditional.var2 = var2_entry.getText();
                 break;
             case "string":
                 var2_entry.setText("");
+                conditional.var2 = var2_entry.getText();
                 break;
             case "Person Property":
                 for (Property property : conditional.person.properties.values()) {
@@ -268,5 +344,38 @@ public class ConditionalEditWindow extends JDialog {
                 break;
         }
         var2_selector.setSelectedItem(last_var2);
+    }
+
+    private void checkEntry(KeyEvent e, JTextField field, String type) {
+        if (e.isActionKey() || e.getKeyCode() == 8) {
+            field.setEditable(true);
+            return;
+        }
+        int loc = field.getCaretPosition();
+        String new_name = field.getText();
+        new_name = new_name.substring(0, loc) + e.getKeyChar() + new_name.substring(loc);
+        switch (type) {
+            case "string":
+                field.setEditable(true);
+                break;
+            case "int":
+                try {
+                    Integer.parseInt(new_name);
+                } catch (NumberFormatException ex) {
+                    field.setEditable(false);
+                    break;
+                }
+                field.setEditable(true);
+                break;
+            case "float":
+                try {
+                    Float.parseFloat(new_name);
+                } catch (NumberFormatException ex) {
+                    field.setEditable(false);
+                    break;
+                }
+                field.setEditable(true);
+                break;
+        }
     }
 }

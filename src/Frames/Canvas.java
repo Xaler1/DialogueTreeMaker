@@ -128,6 +128,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 child_panel.getInConnector().addConnection(parent);
             }
             for (Conditional conditional : node.getConditionals()) {
+                if (conditional.child == null) continue;
                 NodePanel child_panel = graph.getPanel(conditional.child);
                 NodePanel conditional_panel = parent.getConditionalPanel(conditional);
                 conditional_panel.getOutConnector().destination = child_panel.getInConnector();
@@ -301,6 +302,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
             if (panel.contains(point)) {
                 panel.removeAllInConnections();
                 panel.removeAllOutConnections();
+                panel.removeAllChildren();
                 graph.removeNode(panel);
                 to_remove = panel;
                 break;

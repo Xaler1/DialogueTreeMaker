@@ -15,7 +15,7 @@ import java.beans.PropertyChangeListener;
 
 public class ConditionalBlock extends NodePanel implements PropertyChangeListener {
 
-    private final Conditional conditional;
+    public final Conditional conditional;
 
     private final JLabel remove_btn;
     private final JLabel modify_btn;
@@ -23,8 +23,11 @@ public class ConditionalBlock extends NodePanel implements PropertyChangeListene
     private final JLabel var2;
     private final JLabel comparator;
 
+    private final ConditionalBlock self;
+
     public ConditionalBlock(MainWindow window, Conditional conditional, NodePanel parent) {
         super(window, parent);
+        this.self = this;
         this.conditional = conditional;
 
         setBorder(BorderFactory.createBevelBorder(1));
@@ -43,6 +46,12 @@ public class ConditionalBlock extends NodePanel implements PropertyChangeListene
         remove_btn.setHorizontalAlignment(SwingConstants.CENTER);
         remove_btn.setBorder(BorderFactory.createBevelBorder(0));
         remove_btn.setBackground(Color.WHITE);
+        remove_btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                parent.removeChild(self);
+            }
+        });
         add(remove_btn, constraints);
 
         constraints.gridx = 1;
@@ -111,6 +120,8 @@ public class ConditionalBlock extends NodePanel implements PropertyChangeListene
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        var1.setText(conditional.var1);
+        var2.setText(conditional.var2);
+        comparator.setText(conditional.comparator);
     }
 }

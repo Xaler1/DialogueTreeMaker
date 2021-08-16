@@ -158,4 +158,8 @@ public abstract class NodePanel extends JPanel implements Serializable {
             canvas.removeOutConnections(connector.getParent());
         }
     }
+
+    public void removeChild(NodePanel panel) {}
+
+    public void removeAllChildren() {}
 }

@@ -36,6 +36,10 @@ public class Node implements Serializable {
         return conditional;
     }
 
+    public void removeConditional(Conditional conditional) {
+        conditionals.remove(conditional);
+    }
+
     public List<Conditional> getConditionals() {
         return conditionals;
     }
