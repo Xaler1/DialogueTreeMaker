@@ -39,7 +39,7 @@ public class VariableBlock extends JPanel {
         type_selector.addItem("int");
         type_selector.addItem("float");
         type_selector.addItem("bool");
-        type_selector.setSelectedItem(variable.type.getSimpleName().toLowerCase().replace("eger", "").replace("ean", ""));
+        type_selector.setSelectedItem(variable.type);
         type_selector.setPreferredSize(new Dimension(70, 30));
         type_selector.addItemListener(e -> {
             variable.setType((String) e.getItem());
@@ -87,13 +87,13 @@ public class VariableBlock extends JPanel {
         value_entry.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                switch (variable.type.getSimpleName()) {
-                    case "String":
+                switch (variable.type) {
+                    case "string":
                         return;
-                    case "Integer":
+                    case "int":
                         if (value_entry.getText().equals("")) value_entry.setText("0");
                         break;
-                    case "Float":
+                    case "float":
                         if (value_entry.getText().equals("")) value_entry.setText("0.0");
                         break;
                 }
@@ -105,7 +105,7 @@ public class VariableBlock extends JPanel {
         bool_chooser = new JComboBox<>();
         bool_chooser.addItem("true");
         bool_chooser.addItem("false");
-        if (variable.type == Boolean.class) {
+        if (variable.type.equals("bool")) {
             bool_chooser.setSelectedItem(variable.default_value);
             bool_chooser.setVisible(true);
             value_entry.setVisible(false);
@@ -144,21 +144,16 @@ public class VariableBlock extends JPanel {
     }
 
     private void setDefaultValue() {
-        switch (variable.type.getSimpleName()) {
-            case "String":
-                value_entry.setText("");
-                break;
-            case "Integer":
-                value_entry.setText("0");
-                break;
-            case "Float":
-                value_entry.setText("0.0");
-                break;
-            case "Boolean":
+        switch (variable.type) {
+            case "string" -> value_entry.setText("");
+            case "int" -> value_entry.setText("0");
+            case "float" -> value_entry.setText("0.0");
+            case "bool" -> {
                 value_entry.setVisible(false);
                 bool_chooser.setVisible(true);
                 bool_chooser.setSelectedItem("false");
                 return;
+            }
         }
         value_entry.setVisible(true);
         bool_chooser.setVisible(false);
@@ -188,11 +183,11 @@ public class VariableBlock extends JPanel {
         int loc = value_entry.getCaretPosition();
         String new_value = value_entry.getText();
         new_value = new_value.substring(0, loc) + e.getKeyChar() + new_value.substring(loc);
-        switch (variable.type.getSimpleName()) {
-            case "String":
+        switch (variable.type) {
+            case "string":
                 value_entry.setEditable(true);
                 break;
-            case "Integer":
+            case "int":
                 try {
                     Integer.valueOf(new_value);
                 } catch (NumberFormatException ex) {
@@ -201,7 +196,7 @@ public class VariableBlock extends JPanel {
                 }
                 value_entry.setEditable(true);
                 break;
-            case "Float":
+            case "float":
                 try {
                     Float.valueOf(new_value);
                 } catch (NumberFormatException ex) {

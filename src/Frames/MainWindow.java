@@ -192,7 +192,7 @@ public class MainWindow extends JFrame implements MouseListener {
             @Override
             public void focusLost(FocusEvent e) {
                 if (e.getOppositeComponent() != null && e.getOppositeComponent() instanceof JButton) {
-                    tabs.requestFocusInWindow();
+                    //tabs.requestFocusInWindow();
                 }
             }
         });

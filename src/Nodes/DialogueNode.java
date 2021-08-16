@@ -1,5 +1,6 @@
 package Nodes;
 
+import Managers.Conditional;
 import Managers.Person;
 
 public class DialogueNode extends Node {
@@ -22,6 +23,16 @@ public class DialogueNode extends Node {
 
     public void setPerson(Person person) {
         this.person = person;
+        for (Conditional conditional : conditionals) {
+            conditional.person = person;
+        }
+    }
+
+    @Override
+    public Conditional addConditional() {
+        Conditional conditional = new Conditional(person);
+        conditionals.add(conditional);
+        return conditional;
     }
 
     public Person getPerson() {

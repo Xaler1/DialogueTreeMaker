@@ -11,7 +11,7 @@ import java.util.List;
 public class Node implements Serializable {
     private int id;
     private List<Node> children = new ArrayList<>();
-    private List<Conditional> conditionals = new LinkedList<>();
+    protected List<Conditional> conditionals = new LinkedList<>();
     public Point location;
 
     public void setId(int id){

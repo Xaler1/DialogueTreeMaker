@@ -6,7 +6,7 @@ import java.io.Serializable;
     This class is for storing information about variables that can be used in conditional statements.
  */
 public class Variable implements Serializable {
-    public Class type = String.class;
+    public String type = "string";
     public String name = "";
     public String default_value = "";
     public final int id;
@@ -17,11 +17,6 @@ public class Variable implements Serializable {
     }
 
     public void setType(String type) {
-        switch (type) {
-            case "string" -> this.type = String.class;
-            case "int" -> this.type = Integer.class;
-            case "float" -> this.type = Float.class;
-            case "bool" -> this.type = Boolean.class;
-        }
+        this.type = type;
     }
 }

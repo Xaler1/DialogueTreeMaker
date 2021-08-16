@@ -141,4 +141,13 @@ public class TreeKeeper {
     public Collection<Variable> getVariables() {
         return project.variables.values();
     }
+
+    public Variable getVariableByName(String name) {
+        for (Variable variable : project.variables.values()) {
+            if (variable.name.equals(name)) {
+                return variable;
+            }
+        }
+        return null;
+    }
 }

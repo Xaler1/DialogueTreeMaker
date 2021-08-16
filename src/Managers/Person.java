@@ -73,4 +73,11 @@ public class Person implements Serializable {
         }
         return true;
     }
+
+    public Property getPropertyByName(String name) {
+        for (Property property : properties.values()) {
+            if (property.name.equals(name)) return property;
+        }
+        return null;
+    }
 }

@@ -90,6 +90,7 @@ public class VariablePanel extends JPanel {
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = variable_counter;
+        variable_counter++;
         constraints.anchor = GridBagConstraints.PAGE_START;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.weightx = 1;

@@ -2,19 +2,26 @@ package Managers;
 
 import Nodes.Node;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 
 public class Conditional implements Serializable {
 
-    private Person person;
+    public Person person;
     private boolean is_default = false;
     public String var1_type = "int";
     public String var1 = "1";
     public String comparator = "=";
     public String var2_type = "int";
     public String var2 = "1";
+    private final PropertyChangeSupport notifier = new PropertyChangeSupport(this);
 
     public Node child;
+
+    public void addListener(PropertyChangeListener listener) {
+        notifier.addPropertyChangeListener(listener);
+    }
 
     public Conditional(Person person) {
         this.person = person;

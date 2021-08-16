@@ -1,5 +1,6 @@
 package Panels;
 
+import Frames.ConditionalEditWindow;
 import Frames.MainWindow;
 import Helpers.OutConnector;
 import Managers.Conditional;
@@ -7,8 +8,12 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
-public class ConditionalBlock extends NodePanel{
+public class ConditionalBlock extends NodePanel implements PropertyChangeListener {
 
     private final Conditional conditional;
 
@@ -46,6 +51,13 @@ public class ConditionalBlock extends NodePanel{
         modify_btn.setHorizontalAlignment(SwingConstants.CENTER);
         modify_btn.setBorder(BorderFactory.createBevelBorder(0));
         modify_btn.setBackground(Color.WHITE);
+        modify_btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JDialog dialog = new ConditionalEditWindow(conditional, keeper);
+                dialog.setVisible(true);
+            }
+        });
         add(modify_btn, constraints);
 
         constraints.gridx = 2;
@@ -95,5 +107,10 @@ public class ConditionalBlock extends NodePanel{
 
     public NodePanel getConditionalParent() {
         return parent;
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+
     }
 }

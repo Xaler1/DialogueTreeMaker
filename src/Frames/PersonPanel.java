@@ -117,8 +117,9 @@ public class PersonPanel extends JPanel implements PropertyChangeListener {
                     if (new_id == -1) {
                         JOptionPane.showMessageDialog(this, "You need a unique character name", "Invalid name", JOptionPane.ERROR_MESSAGE);
                     } else {
-                        //TODO: figure out how to added the blocks from the top while preserving all the filling properties
+                        //TODO: figure out how to add the blocks from the top while preserving all the filling properties
                         person = keeper.getPersonByName(name);
+                        System.out.println(person == null);
                         break;
                     }
                 }

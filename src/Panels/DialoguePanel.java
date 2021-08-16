@@ -11,7 +11,10 @@ import Nodes.Node;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 /*
@@ -50,15 +53,13 @@ public class DialoguePanel extends NodePanel{
         addMouseListener(new ComponentListener(window, this));
 
         person_choice = new JComboBox<>();
-        person_choice.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if (refreshing) return;
-                Person person = keeper.getPersonByName((String)(person_choice.getSelectedItem()));
-                node.setPerson(person);
-                if (person == null) return;
-                person_id = person.id;
-            }
+        person_choice.addItem("None");
+        person_choice.addItemListener(e -> {
+            if (refreshing || person_choice.getSelectedItem().equals("None")) return;
+            Person person = keeper.getPersonByName((String)(person_choice.getSelectedItem()));
+            node.setPerson(person);
+            if (person == null) return;
+            person_id = person.id;
         });
         person_choice.setPreferredSize(new Dimension(190, 10));
         add(person_choice, constraints);
@@ -125,6 +126,7 @@ public class DialoguePanel extends NodePanel{
         rescale();
         conditional_panels.put(conditional, block);
         canvas.components.add(block);
+        conditional.addListener(block);
     }
 
     @Override
@@ -141,14 +143,17 @@ public class DialoguePanel extends NodePanel{
     }
 
     /*
-        This reloads the current list of people from the project and adds the to the combo box. Updating the current
+        This reloads the current list of people from the project and adds to the combo box. Updating the current
         person if necessary, e.g. if it has been removed.
      */
     @Override
     public void refresh() {
-        refreshing = true;
+        if (person_choice.getItemCount() > 0) {
+            refreshing = true;
+        }
         boolean contains_old = false;
         person_choice.removeAllItems();
+        person_choice.addItem("None");
         for (Person person : keeper.getPeople()) {
             person_choice.addItem(person.name);
             if (person.id == person_id) {
