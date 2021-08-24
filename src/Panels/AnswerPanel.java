@@ -40,7 +40,7 @@ public class AnswerPanel extends NodePanel {
         constraints.gridy = 0;
         constraints.weightx = 2;
         constraints.weighty = 1;
-        setBackground(Color.orange);
+        loadBackground("orange");
 
         text_entry = new JTextArea("Hello world");
         text_entry.setLineWrap(true);

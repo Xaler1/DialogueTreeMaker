@@ -51,7 +51,7 @@ public class ChoicePanel extends NodePanel {
         self = this;
 
         setLocation(start);
-        setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
+        loadBackground("purple");
         addMouseListener(new ComponentListener(window, this));
 
         person_choice = new JComboBox<>();
@@ -196,7 +196,7 @@ public class ChoicePanel extends NodePanel {
             add(panel, constraints);
             constraints.gridy++;
         }
-        this.setSize((int)(300 * canvas.scale.getX()), (int)(size * canvas.scale.getY()));
+        this.setSize((int)(350 * canvas.scale.getX()), (int)(size * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         in_connector.rescale();

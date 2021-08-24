@@ -33,8 +33,7 @@ public class EndPanel extends NodePanel{
         constraints.insets = new Insets(0, 1, 0, 1);
         setLocation(start);
 
-        setBorder(BorderFactory.createMatteBorder(2, 2, 2, 5, Color.red));
-        setBackground(Color.lightGray);
+        loadBackground("red");
         addMouseListener(new ComponentListener(window, this));
 
         in_connector = new InConnector(this, window);

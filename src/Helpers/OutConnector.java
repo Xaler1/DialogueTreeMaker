@@ -27,6 +27,7 @@ public class OutConnector extends JLabel implements Serializable {
     public OutConnector(NodePanel parent, MainWindow window) {
         this.parent = parent;
         this.window = window;
+        setHorizontalAlignment(SwingConstants.CENTER);
         setPreferredSize(new Dimension(30, 30));
         try {
             source_img = ImageIO.read(new File("imgs/out_connector.png"));

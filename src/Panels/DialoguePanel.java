@@ -49,7 +49,7 @@ public class DialoguePanel extends NodePanel{
         constraints.anchor = GridBagConstraints.CENTER;
 
         setLocation(start.x, start.y);
-        setBorder(BorderFactory.createMatteBorder(5, 2, 2, 2, Color.yellow));
+        loadBackground("lightblue");
         addMouseListener(new ComponentListener(window, this));
 
         person_choice = new JComboBox<>();
@@ -125,7 +125,7 @@ public class DialoguePanel extends NodePanel{
         constraints.gridx = 0;
         constraints.gridy = 5 + conditional_panels.size();
         constraints.weightx = 1;
-        constraints.weighty = 0.3;
+        constraints.weighty = 0.2;
         constraints.gridwidth = 3;
         add(block, constraints);
         rescale();
@@ -181,7 +181,7 @@ public class DialoguePanel extends NodePanel{
     @Override
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);
-        setSize((int)(350 * canvas.scale.getX()), (int)((200 + 30 * conditional_panels.size()) * canvas.scale.getY()));
+        setSize((int)(350 * canvas.scale.getX()), (int)((200 + 40 * conditional_panels.size()) * canvas.scale.getY()));
         person_choice.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         text_entry.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));
         conditional_btn.setFont(window.main_font.deriveFont((float)(20 * canvas.scale.getX())));

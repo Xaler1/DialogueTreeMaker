@@ -30,9 +30,9 @@ public class ConditionalBlock extends NodePanel implements PropertyChangeListene
         this.self = this;
         this.conditional = conditional;
 
-        setBorder(BorderFactory.createBevelBorder(1));
-        setPreferredSize(new Dimension(100, 30));
-        setBackground(Color.GREEN);
+
+        setPreferredSize(new Dimension(100, 20));
+        loadBackground("lightgreen");
         setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.fill = GridBagConstraints.BOTH;
@@ -95,7 +95,6 @@ public class ConditionalBlock extends NodePanel implements PropertyChangeListene
         constraints.weightx = 0.3;
         out_connector = new OutConnector(this, window);
         out_connector.setConditional(conditional);
-        out_connector.setHorizontalAlignment(SwingConstants.TRAILING);
         add(out_connector, constraints);
         rescale();
     }

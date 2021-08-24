@@ -28,6 +28,7 @@ public class InConnector extends JLabel implements Serializable {
         this.parent = parent;
         this.window = window;
         setPreferredSize(new Dimension(30, 30));
+        setHorizontalAlignment(SwingConstants.CENTER);
         connections = new LinkedList<>();
         try {
             source_img = ImageIO.read(new File("imgs/in_connector.png"));

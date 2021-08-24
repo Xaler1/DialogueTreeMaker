@@ -27,7 +27,8 @@ public class StartPanel extends NodePanel {
         GridBagConstraints constraints = new GridBagConstraints();
         setLocation(start.x, start.y);
         addMouseListener(new ComponentListener(window, this));
-        setBackground(Color.lightGray);
+        loadBackground("brightgreen");
+        //setBackground(Color.lightGray);
 
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -58,7 +59,7 @@ public class StartPanel extends NodePanel {
     public void rescale(float mod, Point source) {
         super.rescale(mod, source);
         setSize((int)(120 * canvas.scale.getX()), (int)(50 * canvas.scale.getY()));
-        setBorder(BorderFactory.createMatteBorder((int)(2 * canvas.scale.getY()), (int)(5 * canvas.scale.getX()), (int)(2 * canvas.scale.getY()), (int)(2 * canvas.scale.getX()), Color.green));
+        //setBorder(BorderFactory.createMatteBorder((int)(2 * canvas.scale.getY()), (int)(5 * canvas.scale.getX()), (int)(2 * canvas.scale.getY()), (int)(2 * canvas.scale.getX()), Color.green));
         start_label.setFont(window.main_font.deriveFont((float) (28 * canvas.scale.getY())));
         out_connector.rescale();
         repaint();

@@ -9,8 +9,11 @@ import Managers.Graph;
 import Managers.TreeKeeper;
 import Nodes.Node;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +32,8 @@ public abstract class NodePanel extends JPanel implements Serializable {
     protected Graph graph = null;
     protected final TreeKeeper keeper;
     public Map<Conditional, ConditionalBlock> conditional_panels;
+
+    protected Image background;
 
     /*
         Several constructor to account for the fact that not all panels will have default parents or need a reference to
@@ -71,6 +76,7 @@ public abstract class NodePanel extends JPanel implements Serializable {
     public void refresh(){}
 
     private void setup() {
+        setOpaque(false);
         conditional_panels = new HashMap<>();
     }
 
@@ -163,4 +169,18 @@ public abstract class NodePanel extends JPanel implements Serializable {
     public void removeChild(NodePanel panel) {}
 
     public void removeAllInNodeChildren() {}
+
+    protected void loadBackground(String color) {
+        try {
+            background = ImageIO.read(new File("imgs/tiles/tile_" + color + "_bright.png"));
+        } catch (IOException ignored) { }
+    }
+
+    @Override
+    public void paint(Graphics g) {
+        if (background != null) {
+            g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
+        }
+        super.paint(g);
+    }
 }
