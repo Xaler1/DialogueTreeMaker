@@ -1,6 +1,7 @@
 package Nodes;
 
 import Managers.Conditional;
+import Managers.Person;
 
 import java.awt.*;
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.List;
 public class Node implements Serializable {
     private int id;
     private List<Node> children = new ArrayList<>();
+    protected Person person = null;
     protected List<Conditional> conditionals = new LinkedList<>();
     public Point location;
 
@@ -20,6 +22,14 @@ public class Node implements Serializable {
 
     public int getId() {
         return id;
+    }
+
+    public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public Person getPerson() {
+        return person;
     }
 
     public List<Node> getChildren(){
@@ -34,6 +44,10 @@ public class Node implements Serializable {
         Conditional conditional = new Conditional(false);
         conditionals.add(conditional);
         return conditional;
+    }
+
+    public void addConditional(Conditional conditional) {
+        conditionals.add(conditional);
     }
 
     public void removeConditional(Conditional conditional) {

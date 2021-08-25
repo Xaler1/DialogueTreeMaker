@@ -59,6 +59,10 @@ public class Graph implements Serializable {
         return this.idKeys.get(this.componentKeys.get(itemElement));
     }
 
+    public Node getNode(int id) {
+        return this.idKeys.get(id);
+    }
+
     public void removeNode(NodePanel node) {
         idKeys.remove(componentKeys.get(node));
         componentKeys.remove(node);

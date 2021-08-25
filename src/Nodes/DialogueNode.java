@@ -5,7 +5,6 @@ import Managers.Person;
 
 public class DialogueNode extends Node {
     private String dialogueText;
-    private Person person = null;
     public final boolean isChoice;
 
     public DialogueNode(String dialogueText, boolean isChoice){
