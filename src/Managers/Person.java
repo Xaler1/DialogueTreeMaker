@@ -13,7 +13,7 @@ import java.util.Map;
 public class Person implements Serializable {
 
     public final int id;
-    private int property_id = 0;
+    public int property_id = 0;
     private transient PropertyChangeSupport notifier;
     public String name;
     public transient Image image;

@@ -28,7 +28,7 @@ public class Graph implements Serializable {
     }
 
     private void addNode(NodePanel elementUI, Node item) {
-        this.numNodes += 1;
+        this.numNodes++;
         item.setId(this.numNodes);
         this.componentKeys.put(elementUI, this.numNodes);
         this.idKeys.put(this.numNodes, item);
@@ -78,16 +78,17 @@ public class Graph implements Serializable {
         panel_map.put(idKeys.get(id), panel);
     }
 
+    public void addNode(int id, Node node) {
+        idKeys.put(id, node);
+        numNodes++;
+    }
+
     public NodePanel getPanel(Node node) {
         return panel_map.get(node);
     }
 
     public Collection<Node> getNodes() {
         return idKeys.values();
-    }
-
-    public void writeToFile() {
-
     }
 
     public void createRelation(NodePanel parentElement, NodePanel childElement) {

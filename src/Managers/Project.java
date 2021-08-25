@@ -16,6 +16,7 @@ public class Project implements Serializable {
     public String name;
 
     public Project(String name) {
+        this.name = name;
         graphs = new ArrayList<>();
         people = new HashMap<>();
         variables = new HashMap<>();

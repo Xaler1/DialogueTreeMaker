@@ -253,7 +253,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
      */
     public void createLink(OutConnector out_connector, NodePanel component_end) {
         if (out_connector.destination != null) {
-            out_connector.getParent().removeChild(out_connector.destination.getParent());
+            removeOutConnections(out_connector.getParent());
             out_connector.destination.connections.remove(out_connector);
         }
         out_connector.setDestination(component_end.getInConnector());

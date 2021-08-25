@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Node implements Serializable {
+public abstract class Node implements Serializable {
     private int id;
     private List<Node> children = new ArrayList<>();
     protected Person person = null;
@@ -58,7 +58,7 @@ public class Node implements Serializable {
         return conditionals;
     }
 
-    public void removeChild(Node node){
+    public void removeChild(Node node) {
         this.children.remove(node);
     }
 

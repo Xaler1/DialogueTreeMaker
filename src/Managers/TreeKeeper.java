@@ -2,10 +2,15 @@ package Managers;
 
 import Frames.Canvas;
 import Frames.MainWindow;
+import IO.SkeletonReader;
+import IO.SkeletonWriter;
 
 import javax.swing.*;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
+import java.util.function.ToIntFunction;
+import java.util.stream.IntStream;
 
 /*
     This is a manager class that is responsible for modifying the project - e.g. adding people and variables.
@@ -27,35 +32,33 @@ public class TreeKeeper {
         if (!destination.getName().matches(".+(.tree)$")) {
             destination = new File(destination + ".tree");
         }
+        for (Canvas canvas : window.canvases) {
+            canvas.writeLayout();
+        }
+        project.name = destination.getName().replace(".tree", "");
+        window.setTitle(project.name);
         try {
-            destination.createNewFile();
-            ObjectOutputStream object_writer = new ObjectOutputStream(new FileOutputStream(destination));
-            for (Canvas canvas : window.canvases) {
-                canvas.writeLayout();
-            }
-            object_writer.writeObject(project);
-            object_writer.close();
-            project.name = destination.getName().replace(".tree", "");
-            window.setTitle(project.name);
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getClass().getSimpleName(), "Error", JOptionPane.ERROR_MESSAGE);
+            SkeletonWriter.writeProject(project, destination.getPath());
         } catch (Exception ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(window, "Error writing to file: " + ex.getClass().getSimpleName(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void loadProject(File source) {
         try {
-            String name = source.getName().replace(".tree", "");
-            ObjectInputStream object_reader = new ObjectInputStream(new FileInputStream(source));
-            project = (Project) object_reader.readObject();
-            for (Graph graph : project.graphs) {
-                graph.reInit();
-            }
+            project = SkeletonReader.readProject(source.getPath());
             window.dispose();
-            window = new MainWindow(project.graphs, name, this);
+            window = new MainWindow(project.graphs, project.name, this);
+            IntStream stream = project.people.keySet().stream().mapToInt(new ToIntFunction<Integer>() {
+                @Override
+                public int applyAsInt(Integer value) { return value; }
+            });
+            latest_person_id = stream.max().orElse(0) + 1;
+            stream = project.variables.keySet().stream().mapToInt(new ToIntFunction<Integer>() {
+                @Override
+                public int applyAsInt(Integer value) { return value; }
+            });
+            latest_variable_id = stream.max().orElse(0) + 1;
         } catch (IOException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);

@@ -37,7 +37,11 @@ public class SkeletonWriter {
     private static void writePerson(Person person) throws IOException {
         writer.writeInt(person.id);
         writer.writeUTF(person.name);
-        writer.writeUTF(person.img_name);
+        if (person.img_name == null) {
+            writer.writeUTF("null");
+        } else {
+            writer.writeUTF(person.img_name);
+        }
         writer.writeInt(person.properties.size());
         for (Property property : person.properties.values()) {
             writeProperty(property);
@@ -61,7 +65,7 @@ public class SkeletonWriter {
     private static void writeGraph(Graph graph) throws IOException {
         writer.writeUTF(graph.name);
         writer.writeObject(graph.zoom);
-        writer.writeObject(graph.getNodes().size());
+        writer.writeInt(graph.getNodes().size());
         for (Node node : graph.getNodes()) {
             writer.writeUTF(node.getClass().getSimpleName());
             writeNode(node);

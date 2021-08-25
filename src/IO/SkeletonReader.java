@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToIntFunction;
+import java.util.stream.IntStream;
 
 public class SkeletonReader {
 
@@ -27,19 +29,22 @@ public class SkeletonReader {
         conditional_map = new HashMap<>();
         person_map = new HashMap<>();
         child_map = new HashMap<>();
-        Project project = new Project((String) reader.readObject());
+        Project project = new Project(reader.readUTF());
         version = reader.readInt();
         int num = reader.readInt();
+        System.out.printf("Reading in %d people\n", num);
         for (int i = 0; i < num; i++) {
             Person person = readPerson();
             project.people.put(person.id, person);
         }
         num = reader.readInt();
+        System.out.printf("Reading in %d variables\n", num);
         for (int i = 0; i < num; i++) {
             Variable variable = readVariable();
             project.variables.put(variable.id, variable);
         }
         num = reader.readInt();
+        System.out.printf("Reading in %d graphs\n", num);
         for (int i = 0; i < num; i++) {
             Graph graph = readGraph();
             for (Node node : graph.getNodes()) {
@@ -61,11 +66,20 @@ public class SkeletonReader {
         String name = reader.readUTF();
         Person person = new Person(id, name);
         person.img_name = reader.readUTF();
+        if (person.img_name.equals("null")) {
+            person.img_name = null;
+        }
         int num = reader.readInt();
+        System.out.printf("Person %s has %d properties\n", name, num);
         for (int i = 0; i < num; i++) {
             Property property = readProperty();
-            person.properties.put(person.id, property);
+            person.properties.put(property.id, property);
         }
+        IntStream stream =  person.properties.keySet().stream().mapToInt(new ToIntFunction<Integer>() {
+            @Override
+            public int applyAsInt(Integer value) { return value; }
+        });
+        person.property_id = stream.max().orElse(0) + 1;
         return person;
     }
 
@@ -90,8 +104,10 @@ public class SkeletonReader {
         Graph graph = new Graph(reader.readUTF());
         graph.zoom = (Point2D) reader.readObject();
         int num = reader.readInt();
+        System.out.printf("Graph %s has %d nodes\n", graph.name, num);
         for (int i = 0; i < num; i++) {
             Node node = readNode();
+            graph.addNode(node.getId(), node);
         }
         return graph;
     }
@@ -101,29 +117,37 @@ public class SkeletonReader {
         int id = reader.readInt();
         child_map.put(id, new LinkedList<>());
         Point location = (Point) reader.readObject();
+        int person_id = reader.readInt();
+        System.out.printf("Reading %s", type);
         Node node = null;
         switch (type) {
             case "StartNode":
                 node = new StartNode();
+                break;
             case "EndNode":
                 node = new EndNode();
+                break;
             case "DialogueNode":
-                node = new DialogueNode(reader.readUTF(), reader.readBoolean());
+                String text = reader.readUTF();
+                boolean bool = reader.readBoolean();
+                node = new DialogueNode(text, bool);
+                break;
             case "AnswerNode":
                 node = new AnswerNode(reader.readUTF());
 
         }
         node.setId(id);
         node.location = location;
-        int person_id = reader.readInt();
         if (person_id > -1) {
             node.setPerson(person_map.get(person_id));
         }
         int num = reader.readInt();
+        System.out.printf(" with %d children", num);
         for (int i = 0; i < num; i++) {
             child_map.get(id).add(reader.readInt());
         }
         num = reader.readInt();
+        System.out.printf(" and %d conditionals\n", num);
         for (int i = 0; i < num; i++) {
             Conditional conditional = readConditional();
             node.addConditional(conditional);
