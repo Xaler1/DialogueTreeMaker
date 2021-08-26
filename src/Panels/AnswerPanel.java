@@ -106,9 +106,7 @@ public class AnswerPanel extends NodePanel {
 
     public void setPerson(Person person) {
         this.person = person;
-        for (Conditional conditional : conditional_panels.keySet()) {
-            conditional.person = person;
-        }
+        node.setPerson(person);
     }
 
     @Override

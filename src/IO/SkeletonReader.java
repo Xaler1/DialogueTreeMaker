@@ -52,7 +52,9 @@ public class SkeletonReader {
                     node.addChild(graph.getNode(id));
                 }
                 for (Conditional conditional : node.getConditionals()) {
-                    conditional.child = graph.getNode(conditional_map.get(conditional));
+                    if (conditional_map.keySet().contains(conditional)) {
+                        conditional.child = graph.getNode(conditional_map.get(conditional));
+                    }
                     conditional.person = node.getPerson();
                 }
             }
@@ -162,7 +164,10 @@ public class SkeletonReader {
         conditional.comparator = reader.readUTF();
         conditional.var2_type = reader.readUTF();
         conditional.var2 = reader.readUTF();
-        conditional_map.put(conditional, reader.readInt());
+        int child_id = reader.readInt();
+        if (child_id != -1) {
+            conditional_map.put(conditional, child_id);
+        }
         return conditional;
     }
 

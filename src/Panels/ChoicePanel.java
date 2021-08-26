@@ -167,6 +167,7 @@ public class ChoicePanel extends NodePanel {
         answer_panel.setPreferredSize(new Dimension(190, 50));
         answers.add(answer_panel);
         answer_panel.setNode(graph.getNode(answer_panel));
+        answer_panel.setPerson(this.node.getPerson());
         add(answer_panel, constraints);
         rescale(1, new Point(0, 0));
         window.current_canvas.components.add(answer_panel);
@@ -188,11 +189,11 @@ public class ChoicePanel extends NodePanel {
         constraints.fill = GridBagConstraints.BOTH;
         int size = 150;
         for (AnswerPanel panel : answers) {
-            constraints.weighty = 0.6 + 0.4 * panel.conditional_panels.size();
-            size += 100;
+            constraints.weighty = 0.4 + 0.2 * panel.conditional_panels.size();
+            size += 90;
             size += 40 * panel.conditional_panels.size();
             remove(panel);
-            panel.setPreferredSize(new Dimension(190, (int) ((40 + panel.conditional_panels.size()) * canvas.scale.getY())));
+            panel.setPreferredSize(new Dimension(190, (int) ((40 + 20 * panel.conditional_panels.size()) * canvas.scale.getY())));
             add(panel, constraints);
             constraints.gridy++;
         }

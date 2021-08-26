@@ -26,6 +26,9 @@ public abstract class Node implements Serializable {
 
     public void setPerson(Person person) {
         this.person = person;
+        for (Conditional conditional : conditionals) {
+            conditional.person = person;
+        }
     }
 
     public Person getPerson() {
@@ -41,7 +44,7 @@ public abstract class Node implements Serializable {
     }
 
     public Conditional addConditional() {
-        Conditional conditional = new Conditional(false);
+        Conditional conditional = new Conditional(person);
         conditionals.add(conditional);
         return conditional;
     }

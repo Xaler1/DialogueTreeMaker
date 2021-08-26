@@ -102,6 +102,10 @@ public class SkeletonWriter {
         writer.writeUTF(conditional.comparator);
         writer.writeUTF(conditional.var2_type);
         writer.writeUTF(conditional.var2);
-        writer.writeInt(conditional.child.getId());
+        if (conditional.child == null) {
+            writer.writeInt(-1);
+        } else {
+            writer.writeInt(conditional.child.getId());
+        }
     }
 }

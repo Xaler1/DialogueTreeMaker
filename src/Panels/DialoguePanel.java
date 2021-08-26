@@ -125,7 +125,7 @@ public class DialoguePanel extends NodePanel{
         constraints.gridx = 0;
         constraints.gridy = 5 + conditional_panels.size();
         constraints.weightx = 1;
-        constraints.weighty = 0.2;
+        constraints.weighty = 0.15;
         constraints.gridwidth = 3;
         add(block, constraints);
         rescale();
