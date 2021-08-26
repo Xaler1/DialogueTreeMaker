@@ -1,6 +1,7 @@
 package Managers;
 
 import Frames.Canvas;
+import Frames.LoadInfoFrame;
 import Frames.MainWindow;
 import IO.SkeletonReader;
 import IO.SkeletonWriter;
@@ -20,6 +21,8 @@ public class TreeKeeper {
     private Project project;
     private int latest_person_id = 0;
     private int latest_variable_id = 0;
+    public boolean saved_before = false;
+    private String last_location = "";
 
     private MainWindow window;
 
@@ -28,7 +31,10 @@ public class TreeKeeper {
         window = new MainWindow(project.graphs, "Untitled project", this);
     }
 
-    public void saveProject(File destination) {
+    public void saveProject(File destination, boolean copy) {
+        if (!copy) {
+            destination = new File(last_location);
+        }
         if (!destination.getName().matches(".+(.tree)$")) {
             destination = new File(destination + ".tree");
         }
@@ -38,15 +44,27 @@ public class TreeKeeper {
         project.name = destination.getName().replace(".tree", "");
         window.setTitle(project.name);
         try {
-            SkeletonWriter.writeProject(project, destination.getPath());
-        } catch (Exception ex) {
+            SkeletonWriter.writeProject(project, "tmp");
+            destination.delete();
+            File file = new File("tmp");
+            file.renameTo(destination);
+            saved_before = true;
+            last_location = destination.getAbsolutePath();
+        } catch (IOException ex) {
             ex.printStackTrace();
+            JOptionPane.showMessageDialog(window, "Error saving project: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            File temp = new File("tmp");
+            temp.delete();
         }
     }
 
     public void loadProject(File source) {
+        LoadInfoFrame frame = new LoadInfoFrame(source.getName());
+        frame.update(frame.getGraphics());
         try {
             project = SkeletonReader.readProject(source.getPath());
+            saved_before = true;
             window.dispose();
             window = new MainWindow(project.graphs, project.name, this);
             IntStream stream = project.people.keySet().stream().mapToInt(new ToIntFunction<Integer>() {
@@ -59,6 +77,8 @@ public class TreeKeeper {
                 public int applyAsInt(Integer value) { return value; }
             });
             latest_variable_id = stream.max().orElse(0) + 1;
+            saved_before = true;
+            last_location = source.getAbsolutePath();
         } catch (IOException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -69,6 +89,7 @@ public class TreeKeeper {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error reading from file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        frame.dispose();
     }
 
     public int addCharacter(String name) {

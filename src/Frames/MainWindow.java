@@ -110,10 +110,13 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_item = new JMenuItem("New");
         menu.add(menu_item);
         menu_item = new JMenuItem("Open");
-        menu_item.addActionListener(e -> loadObject());
+        menu_item.addActionListener(e -> loadProject());
         menu.add(menu_item);
         menu_item = new JMenuItem("Save");
-        menu_item.addActionListener(e -> saveObject());
+        menu_item.addActionListener(e -> saveProject(false));
+        menu.add(menu_item);
+        menu_item = new JMenuItem("Save a copy");
+        menu_item.addActionListener(e -> saveProject(true));
         menu.add(menu_item);
         submenu = new JMenu("Export as");
         menu.add(submenu);
@@ -233,6 +236,7 @@ public class MainWindow extends JFrame implements MouseListener {
                 }
             }
         });
+        setupKeybinds();
     }
 
     //Whatever Zinks2 is doing.
@@ -240,17 +244,21 @@ public class MainWindow extends JFrame implements MouseListener {
         System.out.println("RAN!");
     }
 
-    private void saveObject() {
+    private void saveProject(boolean new_file) {
+        if (!new_file && keeper.saved_before) {
+            keeper.saveProject(null, false);
+            return;
+        }
         final JFileChooser chooser = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("Dialogue trees", "tree");
         chooser.setFileFilter(filter);
         int result = chooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-            keeper.saveProject(chooser.getSelectedFile());
+            keeper.saveProject(chooser.getSelectedFile(), true);
         }
     }
 
-    private void loadObject() {
+    private void loadProject() {
         final JFileChooser chooser = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter("Dialogue trees", "tree");
         chooser.setFileFilter(filter);
@@ -406,6 +414,10 @@ public class MainWindow extends JFrame implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
+        if (e.isControlDown() && e.getButton() == MouseEvent.BUTTON1) {
+            mouse_down = true;
+            trackGrab();
+        }
         if (e.getButton() == MouseEvent.BUTTON2) {
             mouse_down = true;
             trackGrab();
@@ -443,5 +455,46 @@ public class MainWindow extends JFrame implements MouseListener {
      */
     public void endMouse() {
         mouse_down = false;
+    }
+
+    /*
+        This section setups various keybinds for performing things such as saving and opening and creating a new project.
+        As well as copying/pasting and undoing (whenever that is implemented)
+     */
+
+    private final String OPEN_PROJECT = "openProject";
+    private final String SAVE_PROJECT = "saveProject";
+    private final String SAVE_PROJECT_COPY = "saveCopyProject";
+
+    Action openAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            loadProject();
+        }
+    };
+
+    Action saveAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            saveProject(false);
+        }
+    };
+
+    Action saveCopyAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            saveProject(true);
+        }
+    };
+
+    private void setupKeybinds() {
+        InputMap imap = this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        ActionMap amap = this.getRootPane().getActionMap();
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), SAVE_PROJECT);
+        amap.put(SAVE_PROJECT, saveAction);
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), OPEN_PROJECT);
+        amap.put(OPEN_PROJECT, openAction);
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), SAVE_PROJECT_COPY);
+        amap.put(SAVE_PROJECT_COPY, saveCopyAction);
     }
 }

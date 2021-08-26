@@ -52,7 +52,7 @@ public class SkeletonReader {
                     node.addChild(graph.getNode(id));
                 }
                 for (Conditional conditional : node.getConditionals()) {
-                    if (conditional_map.keySet().contains(conditional)) {
+                    if (conditional_map.containsKey(conditional)) {
                         conditional.child = graph.getNode(conditional_map.get(conditional));
                     }
                     conditional.person = node.getPerson();
@@ -60,6 +60,7 @@ public class SkeletonReader {
             }
             project.graphs.add(graph);
         }
+        reader.close();
         return project;
     }
 

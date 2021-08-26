@@ -101,6 +101,7 @@ public class ChoicePanel extends NodePanel {
             }
         });
         add_btn.setPreferredSize(new Dimension(30, 30));
+        add_btn.setHorizontalAlignment(SwingConstants.CENTER);
         add(add_btn, constraints);
         rescale(1, new Point(0, 0));
     }
