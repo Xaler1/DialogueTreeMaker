@@ -14,10 +14,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
+import java.util.*;
 
 
 /*
@@ -51,16 +51,19 @@ public class MainWindow extends JFrame implements MouseListener {
 
     public boolean show_grid = true;
 
+    private Properties config;
+
     /*
         This assembles the main window.
      */
-    public MainWindow(List<Graph> graphs, String name, TreeKeeper keeper) {
+    public MainWindow(List<Graph> graphs, String name, TreeKeeper keeper, Properties config) {
         try {
             //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
+        this.config = config;
 
         Dimension screen_size = Toolkit.getDefaultToolkit().getScreenSize();
         scale = new Point2D.Float(screen_size.width / 2560.0f, screen_size.height / 1440.0f);
@@ -69,6 +72,7 @@ public class MainWindow extends JFrame implements MouseListener {
         self = this;
         this.graphs = graphs;
         this.keeper = keeper;
+        canvases = new ArrayList<>();
 
         //This right click menu.
         right_click_menu = new JPopupMenu();
@@ -108,6 +112,7 @@ public class MainWindow extends JFrame implements MouseListener {
         menu_bar.add(menu);
 
         menu_item = new JMenuItem("New");
+        menu_item.addActionListener(e -> keeper.newProject());
         menu.add(menu_item);
         menu_item = new JMenuItem("Open");
         menu_item.addActionListener(e -> loadProject());
@@ -147,8 +152,7 @@ public class MainWindow extends JFrame implements MouseListener {
 
         menu = new JMenu("Settings");
         menu_bar.add(menu);
-        JCheckBoxMenuItem check_item = new JCheckBoxMenuItem("Show grid");
-        check_item.setSelected(true);
+        final JCheckBoxMenuItem check_item = new JCheckBoxMenuItem("Show grid");
         check_item.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -156,9 +160,22 @@ public class MainWindow extends JFrame implements MouseListener {
                 for (Canvas canvas : canvases) {
                     canvas.updateLines();
                 }
+                config.setProperty("show_grid", String.valueOf(show_grid));
+                saveConfig();
             }
         });
+        check_item.setSelected(Boolean.parseBoolean(config.getProperty("show_grid", "True")));
         menu.add(check_item);
+        final JCheckBoxMenuItem load_last_check = new JCheckBoxMenuItem("Load last project");
+        load_last_check.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                config.setProperty("load_last", String.valueOf(load_last_check.getState()));
+                saveConfig();
+            }
+        });
+        load_last_check.setSelected(Boolean.parseBoolean(config.getProperty("load_last", "true")));
+        menu.add(load_last_check);
         JLabel label = new JLabel("Performance");
         menu.add(label);
         JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 11, 1);
@@ -177,8 +194,11 @@ public class MainWindow extends JFrame implements MouseListener {
                 for (Canvas canvas : canvases) {
                     canvas.num_workers = slider.getValue();
                 }
+                config.setProperty("performance", String.valueOf(slider.getValue()));
+                saveConfig();
             }
         });
+        slider.setValue(Integer.parseInt(config.getProperty("performance", "1")));
         menu.add(slider);
 
         //This section assembles the main portion of the window.
@@ -213,7 +233,6 @@ public class MainWindow extends JFrame implements MouseListener {
         constraints.gridy = 1;
         add(variables_panel, constraints);
 
-        canvases = new ArrayList<>();
         for (Graph graph : graphs) {
             createCanvas(graph);
         }
@@ -237,6 +256,16 @@ public class MainWindow extends JFrame implements MouseListener {
             }
         });
         setupKeybinds();
+    }
+
+    public void saveConfig() {
+        try {
+            FileOutputStream writer = new FileOutputStream("config.properties");
+            config.store(writer, "");
+            writer.close();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     //Whatever Zinks2 is doing.
@@ -465,6 +494,7 @@ public class MainWindow extends JFrame implements MouseListener {
     private final String OPEN_PROJECT = "openProject";
     private final String SAVE_PROJECT = "saveProject";
     private final String SAVE_PROJECT_COPY = "saveCopyProject";
+    private final String NEW_PROJECT = "newProject";
 
     Action openAction = new AbstractAction() {
         @Override
@@ -487,14 +517,27 @@ public class MainWindow extends JFrame implements MouseListener {
         }
     };
 
+    Action newProjectAction = new AbstractAction() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            keeper.newProject();
+        }
+    };
+
     private void setupKeybinds() {
         InputMap imap = this.getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         ActionMap amap = this.getRootPane().getActionMap();
+
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK), SAVE_PROJECT);
         amap.put(SAVE_PROJECT, saveAction);
+
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK), OPEN_PROJECT);
         amap.put(OPEN_PROJECT, openAction);
+
         imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), SAVE_PROJECT_COPY);
         amap.put(SAVE_PROJECT_COPY, saveCopyAction);
+
+        imap.put(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK), NEW_PROJECT);
+        amap.put(NEW_PROJECT, newProjectAction);
     }
 }

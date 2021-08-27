@@ -8,8 +8,10 @@ import IO.SkeletonWriter;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Properties;
 import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
@@ -26,9 +28,24 @@ public class TreeKeeper {
 
     private MainWindow window;
 
+    private final Properties config;
+
     public TreeKeeper() {
+        config = new Properties();
+        try {
+            FileInputStream reader = new FileInputStream("config.properties");
+            config.load(reader);
+            reader.close();
+        } catch (IOException ignored) {}
+
+        boolean load_last = Boolean.parseBoolean(config.getProperty("load_last", "True"));
+        String last = config.getProperty("last", "");
         project = new Project("Untitled project");
-        window = new MainWindow(project.graphs, "Untitled project", this);
+        window = new MainWindow(project.graphs, "Untitled project", this, config);
+
+        if (load_last && !last.equals("")) {
+            loadProject(new File(last));
+        }
     }
 
     public void saveProject(File destination, boolean copy) {
@@ -50,6 +67,8 @@ public class TreeKeeper {
             file.renameTo(destination);
             saved_before = true;
             last_location = destination.getAbsolutePath();
+            config.setProperty("last", last_location);
+            window.saveConfig();
         } catch (IOException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error saving project: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -66,7 +85,7 @@ public class TreeKeeper {
             project = SkeletonReader.readProject(source.getPath());
             saved_before = true;
             window.dispose();
-            window = new MainWindow(project.graphs, project.name, this);
+            window = new MainWindow(project.graphs, project.name, this, config);
             IntStream stream = project.people.keySet().stream().mapToInt(new ToIntFunction<Integer>() {
                 @Override
                 public int applyAsInt(Integer value) { return value; }
@@ -79,6 +98,8 @@ public class TreeKeeper {
             latest_variable_id = stream.max().orElse(0) + 1;
             saved_before = true;
             last_location = source.getAbsolutePath();
+            config.setProperty("last", last_location);
+            window.saveConfig();
         } catch (IOException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(window, "Error accessing file: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -90,6 +111,18 @@ public class TreeKeeper {
             JOptionPane.showMessageDialog(window, "Error reading from file: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         frame.dispose();
+    }
+
+    public void newProject() {
+        int result = JOptionPane.showConfirmDialog(window, "Are you sure? All unsaved changes will be deleted.", "Confirm", JOptionPane.YES_NO_OPTION);
+        if (result != 0) return;
+        window.dispose();
+        saved_before = false;
+        last_location = "";
+        project = new Project("Untitled project");
+        window = new MainWindow(project.graphs, "Untitled project", this, config);
+        config.setProperty("last", "");
+        window.saveConfig();
     }
 
     public int addCharacter(String name) {
