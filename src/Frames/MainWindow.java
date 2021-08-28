@@ -126,14 +126,9 @@ public class MainWindow extends JFrame implements MouseListener {
         submenu = new JMenu("Export as");
         menu.add(submenu);
         menu_item = new JMenuItem("XML");
+        menu_item.addActionListener(e -> exportXML());
         submenu.add(menu_item);
         menu_item = new JMenuItem("JSON");
-        menu_item.setAction(new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                saveAsJson();
-            }
-        });
         submenu.add(menu_item);
 
         menu = new JMenu("Add");
@@ -268,11 +263,6 @@ public class MainWindow extends JFrame implements MouseListener {
         }
     }
 
-    //Whatever Zinks2 is doing.
-    public void saveAsJson() {
-        System.out.println("RAN!");
-    }
-
     private void saveProject(boolean new_file) {
         if (!new_file && keeper.saved_before) {
             keeper.saveProject(null, false);
@@ -294,6 +284,16 @@ public class MainWindow extends JFrame implements MouseListener {
         int result = chooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             keeper.loadProject(chooser.getSelectedFile());
+        }
+    }
+
+    private void exportXML() {
+        final JFileChooser chooser = new JFileChooser();
+        FileFilter filter = new FileNameExtensionFilter("XML files", "xml");
+        chooser.setFileFilter(filter);
+        int result = chooser.showSaveDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            keeper.exportXML(chooser.getSelectedFile());
         }
     }
 

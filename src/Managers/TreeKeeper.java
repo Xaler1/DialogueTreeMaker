@@ -5,6 +5,7 @@ import Frames.LoadInfoFrame;
 import Frames.MainWindow;
 import IO.SkeletonReader;
 import IO.SkeletonWriter;
+import IO.XMLWriter;
 
 import javax.swing.*;
 import java.io.File;
@@ -123,6 +124,18 @@ public class TreeKeeper {
         window = new MainWindow(project.graphs, "Untitled project", this, config);
         config.setProperty("last", "");
         window.saveConfig();
+    }
+
+    public void exportXML(File destination) {
+        if (!destination.getName().matches(".+(.xml)$")) {
+            destination = new File(destination + ".xml");
+        }
+        try {
+            XMLWriter.writeProject(project, destination);
+            JOptionPane.showMessageDialog(window, "Export complete.");
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(window, "Error when exporting: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public int addCharacter(String name) {
