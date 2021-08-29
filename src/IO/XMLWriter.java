@@ -18,8 +18,15 @@ import java.io.File;
 public class XMLWriter {
 
     private static Document doc;
+    private static boolean spaces;
 
-    public static void writeProject(Project project, File destination) throws ParserConfigurationException, TransformerException {
+    public static void writeProject(Project project, File destination, boolean readable) throws ParserConfigurationException, TransformerException {
+        getProjectXML(project, readable);
+        writeToFile(destination);
+    }
+
+    public static Document getProjectXML(Project project, boolean readable) throws ParserConfigurationException {
+        spaces = readable;
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
         doc = builder.newDocument();
@@ -28,20 +35,30 @@ public class XMLWriter {
         root.setAttribute("name", project.name);
         Element person_parent = doc.createElement("people");
         for (Person person : project.people.values()) {
+            if (spaces) person_parent.appendChild(doc.createTextNode("\n\t\t"));
             person_parent.appendChild(getPerson(person));
         }
+        if (spaces && project.people.size() > 0) person_parent.appendChild(doc.createTextNode("\n\t"));
+        if (spaces) root.appendChild(doc.createTextNode("\n\t"));
         root.appendChild(person_parent);
         Element variable_parent = doc.createElement("variables");
         for (Variable variable : project.variables.values()) {
+            if (spaces) variable_parent.appendChild(doc.createTextNode("\n\t\t"));
             variable_parent.appendChild(getVariable(variable));
         }
+        if (spaces && project.variables.size() > 0) variable_parent.appendChild(doc.createTextNode("\n\t"));
+        if (spaces) root.appendChild(doc.createTextNode("\n\t"));
         root.appendChild(variable_parent);
         Element graph_parent = doc.createElement("graphs");
         for (Graph graph : project.graphs) {
+            if (spaces) graph_parent.appendChild(doc.createTextNode("\n\t\t"));
             graph_parent.appendChild(getGraph(graph));
         }
+        if (spaces && project.graphs.size() > 0) graph_parent.appendChild(doc.createTextNode("\n\t"));
+        if (spaces) root.appendChild(doc.createTextNode("\n\t"));
         root.appendChild(graph_parent);
-        writeToFile(destination);
+        if (spaces) root.appendChild(doc.createTextNode("\n"));
+        return doc;
     }
 
     private static void writeToFile(File destination) throws TransformerException {
@@ -59,9 +76,13 @@ public class XMLWriter {
         person_elem.setAttribute("img_name", person.img_name);
         Element properties = doc.createElement("properties");
         for (Property property : person.properties.values()) {
+            if (spaces) properties.appendChild(doc.createTextNode("\n\t\t\t\t"));
             properties.appendChild(getProperty(property));
         }
+        if (spaces && person.properties.size() > 0) properties.appendChild(doc.createTextNode("\n\t\t\t"));
+        if (spaces) person_elem.appendChild(doc.createTextNode("\n\t\t\t"));
         person_elem.appendChild(properties);
+        if (spaces) person_elem.appendChild(doc.createTextNode("\n\t\t"));
         return person_elem;
     }
 
@@ -88,9 +109,13 @@ public class XMLWriter {
         graph_elem.setAttribute("name", graph.name);
         Element node_parent = doc.createElement("nodes");
         for (Node node : graph.getNodes()) {
+            if (spaces) node_parent.appendChild(doc.createTextNode("\n\t\t\t\t"));
             node_parent.appendChild(getNode(node));
         }
+        if (spaces && graph.getNodes().size() > 0) node_parent.appendChild(doc.createTextNode("\n\t\t\t"));
+        if (spaces) graph_elem.appendChild(doc.createTextNode("\n\t\t\t"));
         graph_elem.appendChild(node_parent);
+        if (spaces) graph_elem.appendChild(doc.createTextNode("\n\t\t"));
         return graph_elem;
     }
 
@@ -104,16 +129,23 @@ public class XMLWriter {
         node_elem.setAttribute("person_id", String.valueOf(person_id));
         Element children_parent = doc.createElement("children");
         for (Node child : node.getChildren()) {
+            if (spaces) children_parent.appendChild(doc.createTextNode("\n\t\t\t\t\t\t"));
             Element child_elem = doc.createElement(child.getClass().getSimpleName());
             child_elem.setAttribute("id", String.valueOf(child.getId()));
             children_parent.appendChild(child_elem);
         }
+        if (spaces && node.getChildren().size() > 0) children_parent.appendChild(doc.createTextNode("\n\t\t\t\t\t"));
+        if (spaces) node_elem.appendChild(doc.createTextNode("\n\t\t\t\t\t"));
         node_elem.appendChild(children_parent);
         Element conditional_parent = doc.createElement("conditionals");
         for (Conditional conditional : node.getConditionals()) {
+            if (spaces) conditional_parent.appendChild(doc.createTextNode("\n\t\t\t\t\t\t"));
             conditional_parent.appendChild(getConditional(conditional));
         }
+        if (spaces && node.getConditionals().size() > 0) conditional_parent.appendChild(doc.createTextNode("\n\t\t\t\t\t"));
+        if (spaces) node_elem.appendChild(doc.createTextNode("\n\t\t\t\t\t"));
         node_elem.appendChild(conditional_parent);
+        if (spaces) node_elem.appendChild(doc.createTextNode("\n\t\t\t\t"));
         return node_elem;
     }
 
@@ -124,8 +156,7 @@ public class XMLWriter {
         conditional_elem.setAttribute("comparator", conditional.comparator);
         conditional_elem.setAttribute("var2_type", conditional.var2_type);
         conditional_elem.setAttribute("var2", conditional.var2);
-        int child = -1;
-        if (conditional.child != null) child = conditional.child.getId();
+        int child = (conditional.child == null) ? -1 : conditional.child.getId();
         conditional_elem.setAttribute("child", String.valueOf(child));
         return conditional_elem;
     }

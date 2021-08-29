@@ -3,6 +3,7 @@ package Managers;
 import Frames.Canvas;
 import Frames.LoadInfoFrame;
 import Frames.MainWindow;
+import IO.JSONWriter;
 import IO.SkeletonReader;
 import IO.SkeletonWriter;
 import IO.XMLWriter;
@@ -126,17 +127,21 @@ public class TreeKeeper {
         window.saveConfig();
     }
 
-    public void exportXML(File destination) {
-        if (!destination.getName().matches(".+(.xml)$")) {
-            destination = new File(destination + ".xml");
+    public void export(File destination, String extension){
+        if (!destination.getName().matches(".+(." + extension + ")$")) {
+            destination = new File(destination + "." + extension);
         }
         try {
-            XMLWriter.writeProject(project, destination);
+            switch (extension) {
+                case "xml" -> XMLWriter.writeProject(project, destination, Boolean.parseBoolean(config.getProperty("readable_xml", "false")));
+                case "json" -> JSONWriter.writeProject(project, destination);
+            }
             JOptionPane.showMessageDialog(window, "Export complete.");
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(window, "Error when exporting: " + ex.getCause(), "Error", JOptionPane.ERROR_MESSAGE);
+            ex.printStackTrace();
         }
-    }
+    };
 
     public int addCharacter(String name) {
         for (Person person : project.people.values()) {

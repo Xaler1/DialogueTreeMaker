@@ -14,10 +14,12 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 
 
 /*
@@ -126,9 +128,10 @@ public class MainWindow extends JFrame implements MouseListener {
         submenu = new JMenu("Export as");
         menu.add(submenu);
         menu_item = new JMenuItem("XML");
-        menu_item.addActionListener(e -> exportXML());
+        menu_item.addActionListener(e -> export("XML files", "xml"));
         submenu.add(menu_item);
         menu_item = new JMenuItem("JSON");
+        menu_item.addActionListener(e -> export("JSON files", "json"));
         submenu.add(menu_item);
 
         menu = new JMenu("Add");
@@ -148,29 +151,30 @@ public class MainWindow extends JFrame implements MouseListener {
         menu = new JMenu("Settings");
         menu_bar.add(menu);
         final JCheckBoxMenuItem check_item = new JCheckBoxMenuItem("Show grid");
-        check_item.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                show_grid = check_item.getState();
-                for (Canvas canvas : canvases) {
-                    canvas.updateLines();
-                }
-                config.setProperty("show_grid", String.valueOf(show_grid));
-                saveConfig();
+        check_item.addItemListener(e -> {
+            show_grid = check_item.getState();
+            for (Canvas canvas : canvases) {
+                canvas.updateLines();
             }
+            config.setProperty("show_grid", String.valueOf(show_grid));
+            saveConfig();
         });
         check_item.setSelected(Boolean.parseBoolean(config.getProperty("show_grid", "True")));
         menu.add(check_item);
         final JCheckBoxMenuItem load_last_check = new JCheckBoxMenuItem("Load last project");
-        load_last_check.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                config.setProperty("load_last", String.valueOf(load_last_check.getState()));
-                saveConfig();
-            }
+        load_last_check.addItemListener(e -> {
+            config.setProperty("load_last", String.valueOf(load_last_check.getState()));
+            saveConfig();
         });
         load_last_check.setSelected(Boolean.parseBoolean(config.getProperty("load_last", "true")));
         menu.add(load_last_check);
+        final JCheckBoxMenuItem readable_xml = new JCheckBoxMenuItem("Export readable XML");
+        readable_xml.addItemListener(e -> {
+            config.setProperty("readable_xml", String.valueOf(readable_xml.getState()));
+            saveConfig();
+        });
+        readable_xml.setSelected(Boolean.parseBoolean(config.getProperty("readable_xml", "false")));
+        menu.add(readable_xml);
         JLabel label = new JLabel("Performance");
         menu.add(label);
         JSlider slider = new JSlider(JSlider.HORIZONTAL, 1, 11, 1);
@@ -253,6 +257,10 @@ public class MainWindow extends JFrame implements MouseListener {
         setupKeybinds();
     }
 
+    private void test(Function<File, Void> func) {
+        func.apply(new File(""));
+    }
+
     public void saveConfig() {
         try {
             FileOutputStream writer = new FileOutputStream("config.properties");
@@ -287,13 +295,13 @@ public class MainWindow extends JFrame implements MouseListener {
         }
     }
 
-    private void exportXML() {
+    private void export(String description, String extension) {
         final JFileChooser chooser = new JFileChooser();
-        FileFilter filter = new FileNameExtensionFilter("XML files", "xml");
+        FileFilter filter = new FileNameExtensionFilter(description, extension);
         chooser.setFileFilter(filter);
         int result = chooser.showSaveDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
-            keeper.exportXML(chooser.getSelectedFile());
+            keeper.export(chooser.getSelectedFile(), extension);
         }
     }
 
