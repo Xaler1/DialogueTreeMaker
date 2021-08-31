@@ -1,4 +1,4 @@
-package Panels;
+package Panels.Blocks;
 
 import Frames.CharacterEditWindow;
 import Managers.Person;

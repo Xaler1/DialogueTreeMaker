@@ -2,7 +2,7 @@ package Frames;
 
 import Managers.Person;
 import Managers.TreeKeeper;
-import Panels.PersonBlock;
+import Panels.Blocks.PersonBlock;
 
 import javax.swing.*;
 import java.awt.*;

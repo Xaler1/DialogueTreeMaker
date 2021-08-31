@@ -8,6 +8,7 @@ import Managers.Conditional;
 import Managers.Graph;
 import Managers.TreeKeeper;
 import Nodes.Node;
+import Panels.Blocks.ConditionalBlock;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

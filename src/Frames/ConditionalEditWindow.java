@@ -152,7 +152,7 @@ public class ConditionalEditWindow extends JDialog {
         var2_selector.setSelectedItem(conditional.var2);
         var2_selector.addItemListener(e -> {
             String type = conditional.var2_type;
-            if (type.equals("bool") || type.equals("Person Property") || type.equals("Variable")) {
+            if (type.equals("bool") || type.equals("Person Property") || type.equals("Variabxle")) {
                 conditional.var2 = (String) e.getItem();
             }
         });

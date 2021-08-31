@@ -8,6 +8,7 @@ import Managers.Conditional;
 import Managers.Person;
 import Nodes.DialogueNode;
 import Nodes.Node;
+import Panels.Blocks.ConditionalBlock;
 
 import javax.swing.*;
 import java.awt.*;

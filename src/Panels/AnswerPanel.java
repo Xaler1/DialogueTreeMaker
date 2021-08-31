@@ -7,6 +7,7 @@ import Managers.Graph;
 import Managers.Person;
 import Nodes.AnswerNode;
 import Nodes.Node;
+import Panels.Blocks.ConditionalBlock;
 
 import javax.swing.*;
 import java.awt.*;

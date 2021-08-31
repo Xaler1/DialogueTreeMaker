@@ -1,4 +1,4 @@
-package Panels;
+package Panels.Blocks;
 
 import Managers.TreeKeeper;
 import Managers.Variable;

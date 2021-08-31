@@ -2,7 +2,7 @@ package Frames;
 
 import Managers.TreeKeeper;
 import Managers.Variable;
-import Panels.VariableBlock;
+import Panels.Blocks.VariableBlock;
 
 import javax.swing.*;
 import java.awt.*;

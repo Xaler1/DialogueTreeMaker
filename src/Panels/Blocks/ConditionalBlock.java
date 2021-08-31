@@ -1,10 +1,11 @@
-package Panels;
+package Panels.Blocks;
 
 import Frames.ConditionalEditWindow;
 import Frames.MainWindow;
 import Helpers.OutConnector;
 import Managers.Conditional;
 import Nodes.Node;
+import Panels.NodePanel;
 
 import javax.swing.*;
 import java.awt.*;

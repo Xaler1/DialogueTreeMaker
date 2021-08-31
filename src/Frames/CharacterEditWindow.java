@@ -3,7 +3,7 @@ package Frames;
 import Managers.Person;
 import Managers.Property;
 import Managers.TreeKeeper;
-import Panels.PropertyBlock;
+import Panels.Blocks.PropertyBlock;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

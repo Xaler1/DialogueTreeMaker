@@ -8,6 +8,7 @@ import Nodes.EndNode;
 import Nodes.Node;
 import Nodes.StartNode;
 import Panels.*;
+import Panels.Blocks.ConditionalBlock;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-//TODO: clean up this mess - make all the panel creation functions more or less the same order.
 /*
     This class holds and draws the main representation of a dialogue graph. It is responsible for creating and managing
     the visual representations of the nodes of the graph.
@@ -59,6 +59,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
      */
     public Canvas(Graph graph, MainWindow window, Point2D default_scale) {
         this.graph = graph;
+        setOpaque(false);
         components = new ArrayList<>();
         constraints = new GridBagConstraints();
         main_font = new Font("Serif", Font.PLAIN, 28);
@@ -354,8 +355,7 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
         is effectively a 2D mod function of a reference point - start.
      */
     @Override
-    public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public void paint(Graphics g) {
         Graphics2D painter = (Graphics2D) g;
         if (temp_line != null) {
             painter.draw(temp_line);
@@ -382,5 +382,6 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 painter.draw(new Line2D.Float(0, y, screen_size.width, y));
             }
         }
+        super.paint(g);
     }
 }
