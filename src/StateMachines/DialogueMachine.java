@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 
 public class DialogueMachine {
 
@@ -20,7 +21,7 @@ public class DialogueMachine {
     private Map<Integer, Node> nodes = new HashMap<>();
     private Map<Node, List<Integer>> child_map = new HashMap<>();
     private HashMap<String, StartNode> starts = new HashMap<>();
-    private List<Conditional> conditionals;
+    private List<Conditional> all_conditionals = new LinkedList<>();
     private HashMap<Conditional, Integer> conditional_children = new HashMap<>();
     private HashMap<Answer, Integer> answer_children = new HashMap<>();
     public Node current_node;
@@ -270,8 +271,10 @@ public class DialogueMachine {
         public String var1;
         public String var2;
         public String comparator;
-        public Field var1_source;
-        public Field var2_source;
+
+        Function<String, Object> var1_supplier;
+        Function<String, Object> var2_supplier;
+        String comparison_type;
 
         public Node child;
 
@@ -281,9 +284,53 @@ public class DialogueMachine {
             this.var2_type = var2_type;
             this.var2 = var2;
             this.comparator = comparator;
+
+            switch (var1_type) {
+                case "string" -> var1_supplier = (e) -> {return var1;};
+                case "int" -> var1_supplier = (e) -> {return Float.parseFloat(var1);};
+                case "float" -> var1_supplier = (e) -> {return Float.parseFloat(var1);};
+                case "bool" -> var1_supplier = (e) -> {return Boolean.parseBoolean(var1);};
+            }
+
+            switch (var2_type) {
+                case "string" -> var2_supplier = (e) -> {return var2;};
+                case "int" -> var2_supplier = (e) -> {return Float.parseFloat(var2);};
+                case "float" -> var2_supplier = (e) -> {return Float.parseFloat(var2);};
+                case "bool" -> var2_supplier = (e) -> {return Boolean.parseBoolean(var2);};
+            }
+
+
+            if (var1_type.equals("string")) comparison_type = "string";
+            else if (var1_type.equals("bool")) comparison_type = "bool";
+            else comparison_type = "float";
+        }
+
+        public void setChild(Node child) {
+            this.child = child;
         }
 
         public boolean isSatisfied() {
+            switch (comparison_type) {
+                case "string":
+                    String str1 = (String) var1_supplier.apply(this.var1);
+                    String str2 = (String) var2_supplier.apply(this.var2);
+                    if (comparator.equals("=")) return str1.equals(str2);
+                    else return !str1.equals(str2);
+                case "float":
+                    Float fl1 = (Float) var1_supplier.apply(this.var1);
+                    Float fl2 = (Float) var2_supplier.apply(this.var2);
+                    if (comparator.equals("=")) return fl1.equals(fl2);
+                    else if (comparator.equals(">")) return fl1 > fl2;
+                    else if (comparator.equals("<")) return fl1 < fl2;
+                    else if (comparator.equals(">=")) return fl1 >= fl2;
+                    else if (comparator.equals("<=")) return fl1 <= fl2;
+                    else return !(fl1.equals(fl2));
+                case "bool":
+                    Boolean bool1 = (Boolean) var1_supplier.apply(this.var1);
+                    Boolean bool2 = (Boolean) var2_supplier.apply(this.var2);
+                    if (comparator.equals("=")) return bool1 == bool2;
+                    else return bool1 != bool2;
+            };
             return false;
         }
     }
@@ -328,6 +375,9 @@ public class DialogueMachine {
             }
             for (Answer answer : answer_children.keySet()) {
                 answer.setChild(nodes.get(answer_children.get(answer)));
+            }
+            for (Conditional conditional : conditional_children.keySet()) {
+                conditional.setChild(nodes.get(conditional_children.get(conditional)));
             }
         }
     }
@@ -462,7 +512,7 @@ public class DialogueMachine {
         num = reader.readInt();
         for (int i = 0; i < num; i++) {
             Conditional conditional = readConditional(reader);
-            conditionals.add(conditional);
+            all_conditionals.add(conditional);
             if (node != null) {
                 node.addConditional(conditional);
             } else if (answer != null) {
