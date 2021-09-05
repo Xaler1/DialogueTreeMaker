@@ -59,6 +59,7 @@ public class SkeletonReader {
                 }
             }
             project.graphs.add(graph);
+            child_map.clear();
         }
         reader.close();
         return project;
@@ -109,13 +110,13 @@ public class SkeletonReader {
         int num = reader.readInt();
         System.out.printf("Graph %s has %d nodes\n", graph.name, num);
         for (int i = 0; i < num; i++) {
-            Node node = readNode();
+            Node node = readNode(graph);
             graph.addNode(node.getId(), node);
         }
         return graph;
     }
 
-    private static Node readNode() throws IOException, ClassNotFoundException {
+    private static Node readNode(Graph graph) throws IOException, ClassNotFoundException {
         String type = reader.readUTF();
         int id = reader.readInt();
         child_map.put(id, new LinkedList<>());

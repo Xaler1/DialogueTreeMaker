@@ -274,6 +274,10 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
         }
     }
 
+    public void changeMade() {
+
+    }
+
     /*
         //TODO: probably remove since it doesn't look like anything extra needs to be done.
      */
@@ -357,17 +361,6 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
     @Override
     public void paint(Graphics g) {
         Graphics2D painter = (Graphics2D) g;
-        if (temp_line != null) {
-            painter.draw(temp_line);
-        }
-        for (NodePanel panel : components) {
-            painter.setStroke(new BasicStroke(4f));
-            painter.setPaint(Color.GREEN);
-            if (panel.getOutConnector() != null && panel.getOutConnector().destination != null) {
-                painter.draw(new Line2D.Float(panel.getOutConnector().getCenter(), panel.getOutConnector().destination.getCenter()));
-            }
-            painter.setPaint(Color.BLACK);
-        }
         if (window.show_grid) {
             painter.setStroke(new BasicStroke((float) scale.getX()));
             float spacing = (float) (scale.getX() * 50);
@@ -383,5 +376,16 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
             }
         }
         super.paint(g);
+        if (temp_line != null) {
+            painter.draw(temp_line);
+        }
+        for (NodePanel panel : components) {
+            painter.setStroke(new BasicStroke(4f));
+            painter.setPaint(Color.GREEN);
+            if (panel.getOutConnector() != null && panel.getOutConnector().destination != null) {
+                painter.draw(new Line2D.Float(panel.getOutConnector().getCenter(), panel.getOutConnector().destination.getCenter()));
+            }
+            painter.setPaint(Color.BLACK);
+        }
     }
 }

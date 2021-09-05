@@ -272,6 +272,7 @@ public class MainWindow extends JFrame implements MouseListener {
     }
 
     private void saveProject(boolean new_file) {
+        this.requestFocus();
         if (!new_file && keeper.saved_before) {
             keeper.saveProject(null, false);
             return;
@@ -296,6 +297,7 @@ public class MainWindow extends JFrame implements MouseListener {
     }
 
     private void export(String description, String extension) {
+        tabs.requestFocusInWindow();
         final JFileChooser chooser = new JFileChooser();
         FileFilter filter = new FileNameExtensionFilter(description, extension);
         chooser.setFileFilter(filter);

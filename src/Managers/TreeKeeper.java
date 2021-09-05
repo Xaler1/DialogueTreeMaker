@@ -45,7 +45,7 @@ public class TreeKeeper {
         project = new Project("Untitled project");
         window = new MainWindow(project.graphs, "Untitled project", this, config);
 
-        if (load_last && !last.equals("")) {
+        if (load_last && !last.strip().equals("")) {
             loadProject(new File(last));
         }
     }
