@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DialogueMachine {
 
@@ -28,6 +30,8 @@ public class DialogueMachine {
     public Node current_node;
     public Object variables_source = null;
 
+    public Logger logger;
+
     public enum TYPE {
         START,
         DIALOGUE,
@@ -38,6 +42,12 @@ public class DialogueMachine {
     public class NoSuchGraph extends Exception {
         public NoSuchGraph(String name) {
             super("A graph with the name " + name + " does not exist in this project");
+        }
+    }
+
+    public class WrongSourceType extends Exception {
+        public WrongSourceType(String name, String target_type, String source_type) {
+            super("The variable '" + name + "' was found in the source class, however in the graph it is of type " + target_type + " and in the source class it is of type " + source_type);
         }
     }
 
@@ -95,6 +105,7 @@ public class DialogueMachine {
 
         public void setSource(Field field) {
             field.setAccessible(true);
+            this.source = field;
         }
     }
 
@@ -103,8 +114,8 @@ public class DialogueMachine {
         public int id;
         public String img_name;
         public Image img;
-        public Map<String, Object> properties = new HashMap<>();
-        public Map<String, String> property_types = new HashMap<>();
+        public Map<String, Property> properties = new HashMap<>();
+        private Object source;
 
         public Person(int id, String name, String img_name) {
             this.id = id;
@@ -123,14 +134,51 @@ public class DialogueMachine {
                 case "float" -> default_value = Float.valueOf(value);
                 case "bool" -> default_value = Boolean.valueOf(value);
             }
-            properties.put(name, default_value);
-            property_types.put(name, type);
+            properties.put(name, new Property(name, type, default_value));
         }
 
         public Supplier<Object> generateSupplier (String name) {
             return () -> {
-                return properties.get(name);
+                Property property = properties.get(name);
+                if (property.source == null) return property.default_value;
+                try {
+                    return property.source.get(source);
+                } catch (IllegalAccessException ex) {
+                    return property.default_value;
+                }
             };
+        }
+
+        public void setPropertiesSource(Object source) throws WrongSourceType {
+            this.source = source;
+            for (Property property : properties.values()) {
+                try {
+                    String source_type = source.getClass().getField(property.name).getType().getSimpleName();
+                    source_type = source_type.toLowerCase().replace("ean", "").replace("eger", "");
+                    if (!source_type.equals(property.type)) throw new WrongSourceType(property.name, property.type, source_type);
+                    property.source = source.getClass().getField(property.name);
+                } catch (NoSuchFieldException e) {
+                    logger.log(Level.WARNING, "Could not find field for variable '" + property.name + "'");
+                }
+            }
+        }
+    }
+
+    private class Property {
+        public String name;
+        public Field source = null;
+        public String type;
+        public Object default_value;
+
+        public Property (String name, String type, Object default_value) {
+            this.name = name;
+             this.type = type;
+             this.default_value = default_value;
+        }
+
+        public void setSource(Field field) {
+            field.setAccessible(true);
+            source = field;
         }
     }
 
@@ -313,7 +361,7 @@ public class DialogueMachine {
                     var1_supplier = source.default_supplier;
                 }
                 case "Person Property" -> {
-                    var1_type = person.property_types.get(var1);
+                    var1_type = person.properties.get(var1).type;
                     var1_supplier = person.generateSupplier(var1);
                 }
             }
@@ -329,7 +377,7 @@ public class DialogueMachine {
                     var2_supplier = source.default_supplier;
                 }
                 case "Person Property" -> {
-                    var2_type = person.property_types.get(var2);
+                    var2_type = person.properties.get(var2).type;
                     var2_supplier = person.generateSupplier(var2);
                 }
             }
@@ -377,6 +425,7 @@ public class DialogueMachine {
      */
     public DialogueMachine(File source) throws IOException {
         ObjectInputStream reader = new ObjectInputStream(new FileInputStream(source));
+        logger = Logger.getLogger("StateMachineLog");
         project_name = reader.readUTF();
         project_version = reader.readInt();
         int num = reader.readInt();
@@ -425,6 +474,10 @@ public class DialogueMachine {
         return starts.keySet();
     }
 
+    public Collection<Person> getPeople() {
+        return people.values();
+    }
+
     /**
      * This switches the current node to the start node of a graph with the given name.
      * @param name - the name of the graph to start.
@@ -433,6 +486,29 @@ public class DialogueMachine {
     public void startGraph(String name) throws NoSuchGraph {
         if (!starts.containsKey(name)) throw new NoSuchGraph(name);
         current_node = starts.get(name);
+    }
+
+    public void setVariablesSource(Object source) throws WrongSourceType {
+        variables_source = source;
+        for (Variable variable : variables.values()) {
+            try {
+                String source_type = source.getClass().getField(variable.name).getType().getSimpleName();
+                source_type = source_type.toLowerCase().replace("ean", "").replace("eger", "");
+                if (!source_type.equals(variable.type)) throw new WrongSourceType(variable.name, variable.type, source_type);
+                variable.setSource(source.getClass().getField(variable.name));
+            } catch (NoSuchFieldException e) {
+                logger.log(Level.WARNING, "Could not find field for variable '" + variable.name + "'");
+            }
+        }
+    }
+
+    public boolean setPersonSource(String name, Object source) throws WrongSourceType {
+        for (Person person : people.values()) {
+            if (person.name.equals(name)) {
+                person.setPropertiesSource(source);
+            }
+        }
+        return false;
     }
 
     public InfoState advance() {

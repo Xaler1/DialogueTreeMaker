@@ -302,6 +302,10 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
         //TODO: maybe it makes more sense if this is inside the graph or even the treekeeper?
      */
     public void removeOutConnections(NodePanel panel) {
+        if (panel instanceof ConditionalBlock) {
+            ((ConditionalBlock) panel).conditional.child = null;
+            return;
+        }
         graph.getNode(panel).removeChildren();
     }
 
