@@ -89,7 +89,7 @@ public class VariableBlock extends JPanel {
             public void focusLost(FocusEvent e) {
                 switch (variable.type) {
                     case "string":
-                        return;
+                        break;
                     case "int":
                         if (value_entry.getText().equals("")) value_entry.setText("0");
                         break;

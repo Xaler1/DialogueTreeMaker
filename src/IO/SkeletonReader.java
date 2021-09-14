@@ -70,7 +70,7 @@ public class SkeletonReader {
         String name = reader.readUTF();
         Person person = new Person(id, name);
         person.img_name = reader.readUTF();
-        if (person.img_name.equals("null")) {
+        if (person.img_name.equals("null") || person.img_name.equals("")) {
             person.img_name = null;
         }
         int num = reader.readInt();

@@ -110,7 +110,8 @@ public class Canvas extends JPanel implements PropertyChangeListener, Serializab
                 addStartNode((StartNode) node);
             } else if (node instanceof EndNode) {
                 addEndNode((EndNode) node);
-            } else if (node instanceof DialogueNode temp_node) {
+            } else if (node instanceof DialogueNode) {
+                DialogueNode temp_node = (DialogueNode) node;
                 if (temp_node.isChoice) {
                     addChoiceNode(temp_node);
                 } else {

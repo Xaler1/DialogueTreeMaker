@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class DialogueMachine {
 
@@ -25,6 +26,7 @@ public class DialogueMachine {
     private HashMap<Conditional, Integer> conditional_children = new HashMap<>();
     private HashMap<Answer, Integer> answer_children = new HashMap<>();
     public Node current_node;
+    public Object variables_source = null;
 
     public enum TYPE {
         START,
@@ -66,11 +68,29 @@ public class DialogueMachine {
     private class Variable {
         public String name;
         public String type;
-        public String default_value;
+        public Object default_value;
         public Field source = null;
+        public Supplier<Object> default_supplier;
 
         public Variable(String name, String type, String default_value) {
             this.name = name;
+            this.type = type;
+            switch (type) {
+                case "string" -> this.default_value = default_value;
+                case "int" -> this.default_value = Integer.parseInt(default_value);
+                case "float" -> {
+                    this.default_value = Float.parseFloat(default_value);
+                }
+                case "bool" -> this.default_value = Boolean.parseBoolean(default_value);
+            }
+            default_supplier = () -> {
+                if (source == null) return this.default_value;
+                try {
+                    return source.get(variables_source);
+                } catch (IllegalAccessException ex) {
+                    return this.default_value;
+                }
+            };
         }
 
         public void setSource(Field field) {
@@ -83,7 +103,8 @@ public class DialogueMachine {
         public int id;
         public String img_name;
         public Image img;
-        public Map<String, Property> properties;
+        public Map<String, Object> properties = new HashMap<>();
+        public Map<String, String> property_types = new HashMap<>();
 
         public Person(int id, String name, String img_name) {
             this.id = id;
@@ -92,28 +113,24 @@ public class DialogueMachine {
             try {
                 img = ImageIO.read(new File(img_name));
             } catch (IOException ignored) {}
-            properties = new HashMap<>();
         }
 
         public void addProperty(String name, String type, String value) {
-            Comparable default_value = null;
+            Object default_value = null;
             switch (type) {
                 case "string" -> default_value = value;
                 case "int" -> default_value = Integer.valueOf(value);
                 case "float" -> default_value = Float.valueOf(value);
                 case "bool" -> default_value = Boolean.valueOf(value);
             }
-            properties.put(name, new Property(default_value));
+            properties.put(name, default_value);
+            property_types.put(name, type);
         }
-    }
 
-    private class Property {
-        public Class type;
-        public Comparable value;
-
-        public Property(Comparable value) {
-            this.value = value;
-            this.type = value.getClass();
+        public Supplier<Object> generateSupplier (String name) {
+            return () -> {
+                return properties.get(name);
+            };
         }
     }
 
@@ -272,13 +289,13 @@ public class DialogueMachine {
         public String var2;
         public String comparator;
 
-        Function<String, Object> var1_supplier;
-        Function<String, Object> var2_supplier;
+        Supplier<Object> var1_supplier;
+        Supplier<Object> var2_supplier;
         String comparison_type;
 
         public Node child;
 
-        public Conditional (String var1_type, String var1, String comparator, String var2_type, String var2) {
+        public Conditional (String var1_type, String var1, String comparator, String var2_type, String var2, Person person) {
             this.var1_type = var1_type;
             this.var1 = var1;
             this.var2_type = var2_type;
@@ -286,17 +303,35 @@ public class DialogueMachine {
             this.comparator = comparator;
 
             switch (var1_type) {
-                case "string" -> var1_supplier = (e) -> {return var1;};
-                case "int" -> var1_supplier = (e) -> {return Float.parseFloat(var1);};
-                case "float" -> var1_supplier = (e) -> {return Float.parseFloat(var1);};
-                case "bool" -> var1_supplier = (e) -> {return Boolean.parseBoolean(var1);};
+                case "string" -> var1_supplier = () -> {return var1;};
+                case "int" -> var1_supplier = () -> {return Float.parseFloat(var1);};
+                case "float" -> var1_supplier = () -> {return Float.parseFloat(var1);};
+                case "bool" -> var1_supplier = () -> {return Boolean.parseBoolean(var1);};
+                case "Variable" -> {
+                    Variable source = variables.get(var1);
+                    var1_type = source.type;
+                    var1_supplier = source.default_supplier;
+                }
+                case "Person Property" -> {
+                    var1_type = person.property_types.get(var1);
+                    var1_supplier = person.generateSupplier(var1);
+                }
             }
 
             switch (var2_type) {
-                case "string" -> var2_supplier = (e) -> {return var2;};
-                case "int" -> var2_supplier = (e) -> {return Float.parseFloat(var2);};
-                case "float" -> var2_supplier = (e) -> {return Float.parseFloat(var2);};
-                case "bool" -> var2_supplier = (e) -> {return Boolean.parseBoolean(var2);};
+                case "string" -> var2_supplier = () -> {return var2;};
+                case "int" -> var2_supplier = () -> {return Float.parseFloat(var2);};
+                case "float" -> var2_supplier = () -> {return Float.parseFloat(var2);};
+                case "bool" -> var2_supplier = () -> {return Boolean.parseBoolean(var2);};
+                case "Variable" -> {
+                    Variable source = variables.get(var2);
+                    var2_type = source.type;
+                    var2_supplier = source.default_supplier;
+                }
+                case "Person Property" -> {
+                    var2_type = person.property_types.get(var2);
+                    var2_supplier = person.generateSupplier(var2);
+                }
             }
 
 
@@ -312,13 +347,13 @@ public class DialogueMachine {
         public boolean isSatisfied() {
             switch (comparison_type) {
                 case "string":
-                    String str1 = (String) var1_supplier.apply(this.var1);
-                    String str2 = (String) var2_supplier.apply(this.var2);
+                    String str1 = (String) var1_supplier.get();
+                    String str2 = (String) var2_supplier.get();
                     if (comparator.equals("=")) return str1.equals(str2);
                     else return !str1.equals(str2);
                 case "float":
-                    Float fl1 = (Float) var1_supplier.apply(this.var1);
-                    Float fl2 = (Float) var2_supplier.apply(this.var2);
+                    Float fl1 = (Float) var1_supplier.get();
+                    Float fl2 = (Float) var2_supplier.get();
                     if (comparator.equals("=")) return fl1.equals(fl2);
                     else if (comparator.equals(">")) return fl1 > fl2;
                     else if (comparator.equals("<")) return fl1 < fl2;
@@ -326,8 +361,8 @@ public class DialogueMachine {
                     else if (comparator.equals("<=")) return fl1 <= fl2;
                     else return !(fl1.equals(fl2));
                 case "bool":
-                    Boolean bool1 = (Boolean) var1_supplier.apply(this.var1);
-                    Boolean bool2 = (Boolean) var2_supplier.apply(this.var2);
+                    Boolean bool1 = (Boolean) var1_supplier.get();
+                    Boolean bool2 = (Boolean) var2_supplier.get();
                     if (comparator.equals("=")) return bool1 == bool2;
                     else return bool1 != bool2;
             };
@@ -431,6 +466,13 @@ public class DialogueMachine {
         return null;
     }
 
+    public String getText() {
+        if (current_node == null) return null;
+        if (current_node.type == TYPE.DIALOGUE) return ((DialogueNode) current_node).text;
+        if (current_node.type == TYPE.CHOICE) return ((ChoiceNode) current_node).text;
+        return null;
+    }
+
     public String getProjectName() {
         return project_name;
     }
@@ -442,6 +484,7 @@ public class DialogueMachine {
         int num = reader.readInt();
         Person person = new Person(id, name, img_name);
         for (int i = 0; i < num; i++) {
+            reader.readInt();
             String prop_name = reader.readUTF();
             String type = reader.readUTF();
             String value = reader.readUTF();
@@ -511,7 +554,7 @@ public class DialogueMachine {
         }
         num = reader.readInt();
         for (int i = 0; i < num; i++) {
-            Conditional conditional = readConditional(reader);
+            Conditional conditional = readConditional(reader, person);
             all_conditionals.add(conditional);
             if (node != null) {
                 node.addConditional(conditional);
@@ -521,13 +564,13 @@ public class DialogueMachine {
         }
     }
 
-    private Conditional readConditional(ObjectInputStream reader) throws IOException {
+    private Conditional readConditional(ObjectInputStream reader, Person person) throws IOException {
         String var1_type = reader.readUTF();
         String var1 = reader.readUTF();
         String comparator = reader.readUTF();
         String var2_type = reader.readUTF();
         String var2 = reader.readUTF();
-        Conditional new_conditional = new Conditional(var1_type, var1, comparator, var2_type, var2);
+        Conditional new_conditional = new Conditional(var1_type, var1, comparator, var2_type, var2, person);
         conditional_children.put(new_conditional, reader.readInt());
         return new_conditional;
     }
