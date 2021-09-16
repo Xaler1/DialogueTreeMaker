@@ -36,6 +36,7 @@ public class SkeletonReader {
         for (int i = 0; i < num; i++) {
             Person person = readPerson();
             project.people.put(person.id, person);
+            person_map.put(person.id, person);
         }
         num = reader.readInt();
         System.out.printf("Reading in %d variables\n", num);

@@ -51,6 +51,9 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Provides all the basic info about the current state in one object.
+     */
     public class InfoState {
         public String person_name;
         public Image person_image;
@@ -75,6 +78,10 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Represents a single variable in the project. Stores the name, type, default value, as well as the source field from
+     * which the supplier function can take values.
+     */
     private class Variable {
         public String name;
         public String type;
@@ -103,12 +110,21 @@ public class DialogueMachine {
             };
         }
 
+        /**
+         * Sets the source field for this variable to be used by the supplier function.
+         * @param field
+         */
         public void setSource(Field field) {
             field.setAccessible(true);
             this.source = field;
         }
     }
 
+    /**
+     * Represents a single person in the project. Stores the name, the id, and the name of the image. Upon construction
+     * also attempts to load the image from the working directory. Also stores a list of properties. Can also store the
+     * source object from the fields of which the properties can take value.
+     */
     private class Person {
         public String name;
         public int id;
@@ -126,6 +142,12 @@ public class DialogueMachine {
             } catch (IOException ignored) {}
         }
 
+        /**
+         * Adds a new property to this person.
+         * @param name the name of the property.
+         * @param type the type of the property.
+         * @param value the default value of the property.
+         */
         public void addProperty(String name, String type, String value) {
             Object default_value = null;
             switch (type) {
@@ -137,6 +159,12 @@ public class DialogueMachine {
             properties.put(name, new Property(name, type, default_value));
         }
 
+        /**
+         * Generates a new supplier for the property with the given name.
+         * @param name the name of the property for which to generate the supplier.
+         * @return the supplier function which will provide either the default value of the property or take the value
+         * from the corresponding field of the given source object.
+         */
         public Supplier<Object> generateSupplier (String name) {
             return () -> {
                 Property property = properties.get(name);
@@ -149,6 +177,12 @@ public class DialogueMachine {
             };
         }
 
+        /**
+         * Sets the source object. Its fields will be used to get the values of properties which have the same name as the field.
+         * @param source the source object which should have fields with names equal to the names of the properties of this person.
+         * @throws WrongSourceType in case the source object contains a field with the same name as some property of this
+         * person, but the type of the field does not match the type of the property.
+         */
         public void setPropertiesSource(Object source) throws WrongSourceType {
             this.source = source;
             for (Property property : properties.values()) {
@@ -164,6 +198,10 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Represents a property of a person. Stores the name, type, default value and the source field from which to take the
+     * value.
+     */
     private class Property {
         public String name;
         public Field source = null;
@@ -176,12 +214,22 @@ public class DialogueMachine {
              this.default_value = default_value;
         }
 
+        /**
+         * Sets the source field for this property.
+         * @param field the source field from which the value of this property will be taken.
+         */
         public void setSource(Field field) {
             field.setAccessible(true);
             source = field;
         }
     }
 
+    /**
+     * This is the base class of all the nodes. Stores features common to all nodes - the type, the child, the person
+     * (the person is not common to all nodes, but to 2 and makes it more convenient). Also stores the list of conditionals
+     * attached to this node. (Also only common to two of the nodes, but makes it more convenient with less casting and
+     * instanceof comparisons required when advancing.
+     */
     private abstract class Node {
         public TYPE type;
         public Node child;
@@ -192,47 +240,75 @@ public class DialogueMachine {
             this.type = type;
         }
 
+        /**
+         * Sets the person for this node.
+         * @param person the person of this node.
+         */
         public void setPerson(Person person) {
             this.person = person;
         }
 
+        /**
+         * Sets the child of this node i.e. the default node to go to when advancing.
+         * @param child the child of this node.
+         */
         public void setChild(Node child) {
             this.child = child;
         }
 
+        /**
+         * Adds a conditional to this node.
+         * @param conditional a conditional of this node.
+         */
         public void addConditional(Conditional conditional) {
             conditionals.add(conditional);
         }
 
+        //These are the two advancing functions, the standard one is mandatory, but the one taking in an answer is optional, since
+        // only the dialogue node needs to implement it.
         public abstract void advance();
-        public void advance(String answer) {};
+        public void advance(String answer) {
+            advance();
+        };
     }
 
+    /**
+     * Represents a start node of the graph. Very basic only stores a child.
+     */
     private class StartNode extends Node {
 
         public StartNode() {
             super(TYPE.START);
         }
 
+        /**
+         * Simply sets the current node to this node's child.
+         */
         @Override
         public void advance() {
             current_node = child;
         }
     }
 
+    /**
+     * Represents a end node of the graph. Also very basic, does not even have a child.
+     */
     private class EndNode extends Node {
 
         public EndNode() {
             super(TYPE.END);
         }
 
-
+        /**
+         * Does nothing as this node represents the end of a graph.
+         */
         @Override
-        public void advance() {
-            current_node = null;
-        }
+        public void advance() {}
     }
 
+    /**
+     * Represents a dialogue node in the graph. Stores the text and can also have conditionals.
+     */
     private class DialogueNode extends Node {
         public final String text;
 
@@ -242,6 +318,11 @@ public class DialogueMachine {
         }
 
 
+        /**
+         * Checks whether any of the conditionals of this node are satisfied. If there is one then it sets the current
+         * node to the child of the first satisfied conditional. If no conditionals are satisfied (or there are none) the
+         * it sets the current node to this node's default child.
+         */
         @Override
         public void advance() {
             for (Conditional conditional : conditionals) {
@@ -254,6 +335,9 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Represents a choice node. Stores the text and also a list of answers.
+     */
     private class ChoiceNode extends Node {
 
         private final Map<String, Answer> node_answers = new HashMap<>();
@@ -268,11 +352,19 @@ public class DialogueMachine {
 
         }
 
+        /**
+         * Adds a new answer to this node.
+         * @param answer the new answer to be added.
+         */
         public void addAnswer(Answer answer) {
             node_answers.put(answer.text, answer);
             answer_texts.add(answer.text);
         }
 
+        /**
+         * Returns an array of strings that are the texts tof the answers.
+         * @return a String[] of answer texts.
+         */
         public String[] getAnswerOptions() {
             String[] options = new String[node_answers.size()];
             int counter = 0;
@@ -283,15 +375,22 @@ public class DialogueMachine {
             return options;
         }
 
+        /**
+         * Sets the current node to the child of the first answer in the list (or the child of one of its conditionals), since no text was provided.
+         */
         @Override
         public void advance() {
             if (node_answers.size() == 0) {
                 current_node = null;
                 return;
             }
-            current_node = node_answers.values().iterator().next().getChild();
+            current_node = node_answers.get(answer_texts.get(0)).getChild();
         }
 
+        /**
+         * Sets the current node to the child of the answer with the text provided (or the child of one of its conditionals).
+         * @param answer
+         */
         @Override
         public void advance(String answer) {
             Answer selected_answer = node_answers.get(answer);
@@ -303,6 +402,11 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Represents an answer in a choice node. Stores the child and the text, as well as a list of conditionals.
+     * Does not extend Node since inside the state machine it is more convenient to think of it as just a container or info
+     * and a direct part of the choice node, rather than a separate node.
+     */
     private class Answer {
         private Node child;
         public String text;
@@ -312,14 +416,27 @@ public class DialogueMachine {
             this.text = text;
         }
 
+        /**
+         * Sets the child of this answer.
+         * @param child the child of the answer.
+         */
         public void setChild(Node child) {
             this.child = child;
         }
 
+        /**
+         * Adds a conditional to this answer.
+         * @param conditional the new conditional
+         */
         public void addConditional(Conditional conditional) {
             conditionals.add(conditional);
         }
 
+        /**
+         * Does the same process with conditionals as the dialogue node - checking if any are satisfied and returning the
+         * child of the satisfied conditional or returning the default child.
+         * @return
+         */
         public Node getChild() {
             for (Conditional conditional : conditionals) {
                 if (conditional.isSatisfied()) {
@@ -330,6 +447,19 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Represents a conditional statement. Stores the two variables and their types, as well as the comparator.
+     * Also stores the two final suppliers of the variables' values.
+     * For speed, simplicity and avoidance of an even bigger mess of nested switches and/or if statements (occurring from
+     * the fact that variables can be of 4 different classes and come from 4 different sources.) The values inside the comparison
+     * are all taken from a supplier for each of the two variables. This means that the comparison does not case whether
+     * variable value comes from a constant or from a variable or from a person's property. That is determined at initialization.
+     * The comparison itself only switches on the comparison type. This still means that there are two separate switche,
+     * one for the variable source and one for the variable type, however it means that the switches are not nested and there
+     * is no code duplication. It also just looks neater. The use of supplier functions also means that it can determine easier
+     * at runtime whether there is a field provided from which the variable or the person's property can take the value, or
+     * if it should just give it the default.
+     */
     private class Conditional {
         public String var1_type;
         public String var2_type;
@@ -351,10 +481,10 @@ public class DialogueMachine {
             this.comparator = comparator;
 
             switch (var1_type) {
-                case "string" -> var1_supplier = () -> {return var1;};
-                case "int" -> var1_supplier = () -> {return Float.parseFloat(var1);};
-                case "float" -> var1_supplier = () -> {return Float.parseFloat(var1);};
-                case "bool" -> var1_supplier = () -> {return Boolean.parseBoolean(var1);};
+                case "string" -> var1_supplier = () -> var1;
+                case "int" -> var1_supplier = () -> Float.parseFloat(var1);
+                case "float" -> var1_supplier = () -> Float.parseFloat(var1);
+                case "bool" -> var1_supplier = () -> Boolean.parseBoolean(var1);
                 case "Variable" -> {
                     Variable source = variables.get(var1);
                     var1_type = source.type;
@@ -367,10 +497,10 @@ public class DialogueMachine {
             }
 
             switch (var2_type) {
-                case "string" -> var2_supplier = () -> {return var2;};
-                case "int" -> var2_supplier = () -> {return Float.parseFloat(var2);};
-                case "float" -> var2_supplier = () -> {return Float.parseFloat(var2);};
-                case "bool" -> var2_supplier = () -> {return Boolean.parseBoolean(var2);};
+                case "string" -> var2_supplier = () -> var2;
+                case "int" -> var2_supplier = () -> Float.parseFloat(var2);
+                case "float" -> var2_supplier = () -> Float.parseFloat(var2);
+                case "bool" -> var2_supplier = () -> Boolean.parseBoolean(var2);
                 case "Variable" -> {
                     Variable source = variables.get(var2);
                     var2_type = source.type;
@@ -392,6 +522,11 @@ public class DialogueMachine {
             this.child = child;
         }
 
+        /**
+         * Performs the set comparison between the two values supplied by the supplier functions.
+         * For practical purposes integers are treated as floats.
+         * @return whether the conditional is satisfied with the present values.
+         */
         public boolean isSatisfied() {
             switch (comparison_type) {
                 case "string":
@@ -474,6 +609,10 @@ public class DialogueMachine {
         return starts.keySet();
     }
 
+    /**
+     * Returns a list of people objects in the current project.
+     * @return a Collection of Person objects present in the current project.
+     */
     public Collection<Person> getPeople() {
         return people.values();
     }
@@ -488,6 +627,15 @@ public class DialogueMachine {
         current_node = starts.get(name);
     }
 
+    /**
+     * Sets the source object for all the variables' values. The object needs to have fields that have the same name as the
+     * variables in the project. Each variable will take its value (during the evaluation of a conditional) directly
+     * from the field with the same name as the variable.
+     * Be warned: this will make these fields accessible
+     * @param source the object whose fields are to be used as a source for values of variables.
+     * @throws WrongSourceType if there is a field that has the same name as a variable in this project, but the type of
+     * the field is different from that of the variable.
+     */
     public void setVariablesSource(Object source) throws WrongSourceType {
         variables_source = source;
         for (Variable variable : variables.values()) {
@@ -502,15 +650,31 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Sets the given object as the source for all the person's (with the given name) properties' values. The object needs
+     * to have fields with the same name as the person's property names for the fields to be used as the source. Each property
+     * will directly take its value (during the evaluation of a conditional) from a field in this object with the same name
+     * as the property.
+     * @param name the name of the person for which to set the object as the source.
+     * @param source the object whose fields are to be used as a source.
+     * @return true if a person with this name was found. false if not.
+     * @throws WrongSourceType if the object contains a field with the same name as one of the person's properties, but the type
+     * of the field is different to that of the person's property.
+     */
     public boolean setPersonSource(String name, Object source) throws WrongSourceType {
         for (Person person : people.values()) {
             if (person.name.equals(name)) {
                 person.setPropertiesSource(source);
+                return true;
             }
         }
         return false;
     }
 
+    /**
+     * Tells the current node to advance and then generates a new InfoState if the new node is not the end node and is not null.
+     * @return the newly generated InfoState.
+     */
     public InfoState advance() {
         if (current_node == null) return null;
         current_node.advance();
@@ -526,6 +690,12 @@ public class DialogueMachine {
         return null;
     }
 
+    /**
+     * Tells the current node to advance while selecting an answer. At present only used for choice nodes. After advancing
+     * generates a new InfoState.
+     * @param answer the answer to use (for the choice node)
+     * @return the newly generated InfoState.
+     */
     public InfoState advance(String answer) {
         try {
             current_node.advance(answer);
@@ -542,6 +712,10 @@ public class DialogueMachine {
         return null;
     }
 
+    /**
+     * Returns the text of the current node, or null if the node cannot have text.
+     * @return the text of the current node.
+     */
     public String getText() {
         if (current_node == null) return null;
         if (current_node.type == TYPE.DIALOGUE) return ((DialogueNode) current_node).text;
@@ -549,10 +723,21 @@ public class DialogueMachine {
         return null;
     }
 
+    /**
+     * Returns the name of the current project.
+     * @return the name of the current project.
+     */
     public String getProjectName() {
         return project_name;
     }
 
+    /**
+     * Reads a person from the input stream given. Reades the id, the name and the image name. Next it also reads all the
+     * properties of the person and adds them to the person.
+     * @param reader the ObjectInputStream from which to read a person.
+     * @return a new Person object with the info read.
+     * @throws IOException if there is a problem with reading.
+     */
     private Person readPerson(ObjectInputStream reader) throws IOException {
         int id = reader.readInt();
         String name = reader.readUTF();
@@ -569,6 +754,12 @@ public class DialogueMachine {
         return person;
     }
 
+    /**
+     * Reads a variable from an input stream. Reads the name, type and the default value.
+     * @param reader the ObjectInputStream from which to read the variable.
+     * @return a new Variable object with the info read.
+     * @throws IOException if there is a problem reading.
+     */
     private Variable readVariable(ObjectInputStream reader) throws IOException {
         reader.readInt();
         String name = reader.readUTF();
@@ -577,6 +768,15 @@ public class DialogueMachine {
         return new Variable(name, type, val);
     }
 
+    /**
+     * Reads a new node from an input stream. Reads all the info associated with a node. Assignes a child if it has one,
+     * assigns a person if it has one and adds all the answers/conditionals that the node might have.
+     * @param reader the ObjectInputStream from which to read the person.
+     * @param graph the name of the graph to which this node belongs. This is needed for reconstructing the graph. Since
+     * a node might be read before its child, they are first all stored is a map with their ids, but since ids can repeat
+     * between graphs, there is also a map between the graph name and the list of ids.
+     * @throws IOException if there is a problem reading.
+     */
     private void readNode(ObjectInputStream reader, String graph) throws IOException {
         String type = reader.readUTF();
         int id = reader.readInt();
@@ -640,6 +840,14 @@ public class DialogueMachine {
         }
     }
 
+    /**
+     * Reads a conditional from the input stream.
+     * @param reader the ObjectInputStream from which to read the conditional.
+     * @param person the person to which this conditional belongs, since the conditional needs to know the person to
+     * which it belongs at construction time.
+     * @return a new Conditional with all the info read.
+     * @throws IOException if there is a problem reading.
+     */
     private Conditional readConditional(ObjectInputStream reader, Person person) throws IOException {
         String var1_type = reader.readUTF();
         String var1 = reader.readUTF();
