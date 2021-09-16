@@ -1,5 +1,3 @@
-***Warning - under heavy development, this is in no way complete. Clone only if you are curious**
-
 The aim of DialogueTreeMaker is to create a simple to use, but at the same time versatile dialogue tree graph. 
 The main target is dialogues in games, but can also be used anywhere else dialogue trees are required (chat bots etc.)
 You can currently export to JSON and XML which can then be read in to the user's program which ever way they like.
